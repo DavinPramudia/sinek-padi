@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // 1. Tabel Users Custom milikmu
         Schema::create('users', function (Blueprint $table) {
             $table->id('id_users'); 
             $table->string('username')->unique(); 
             $table->string('password');
 
-            // Foreign Key ke tabel roles
-            $table->foreignId('id_roles')->constrained('roles', 'id_roles')->onDelete('cascade');
-            
+            $table->unsignedBigInteger('id_roles');
+            $table->foreign('id_roles')->references('id_roles')->on('roles')->onDelete('cascade');
+
             $table->rememberToken();
             $table->timestamps();
         });
@@ -31,7 +32,9 @@ return new class extends Migration
 
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
+            
             $table->foreignId('user_id')->nullable()->index()->constrained('users', 'id_users')->onDelete('cascade');
+            
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->longText('payload');
