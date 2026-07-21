@@ -6,10 +6,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/loket', function () {
-    return view('loket');
+Route::get('/petugas/loket', function () {
+    return view('petugas.loket');
 });
 
-Route::get('/loket_real', function () {
-    return view('loket_real');
+Route::get('/petugas/loket_real', function () {
+    return view('petugas.loket_real');
 });
