@@ -17,8 +17,8 @@
             <div class="grid grid-cols-2 gap-4">
                 @php
                     $kendaraan = [
-                        ['id' => 'motor', 'label' => 'Motor', 'icon' => 'motorcycle.png'],
-                        ['id' => 'mobil', 'label' => 'Mobil', 'icon' => 'car.png'],
+                        ['id' => 'motor', 'label' => 'Motor (Roda 2)'],
+                        ['id' => 'mobil', 'label' => 'Mobil (Roda 4)'],
                     ];
                 @endphp
 
@@ -26,10 +26,10 @@
                     <button type="button"
                             id="btn-{{ $item['id'] }}"
                             onclick="pilihKategori('{{ $item['id'] }}')"
-                            class="bg-[#408175] hover:bg-[#3aafa9] text-brand-text rounded-xl p-4 flex flex-col items-center justify-center text-center w-full transition duration-150 shadow-md">
-                        <img src="{{ asset('assets/icons/' . $item['icon']) }}" class="w-10 h-10 object-contain mb-1" alt="{{ $item['label'] }}">
-                        <span class="text-xs font-semibold text-[#d1d5dc]">{{ $item['label'] }}</span>
+                            class="bg-[#408175] hover:bg-[#3aafa9] text-brand-text rounded-xl p-6 flex flex-col items-center justify-center text-center w-full transition duration-150 shadow-md">
+                        <span class="text-xl font-semibold text-[#d1d5dc]">{{ $item['label'] }}</span>
                     </button>
+                @endforeach
 
                 {{-- Tombol Motor --}}
                 {{-- <button type="button"
