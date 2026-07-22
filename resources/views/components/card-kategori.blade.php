@@ -1,54 +1,35 @@
-<div class="bg-brand-card rounded-3xl p-5 shadow-lg flex flex-col justify-between space-y-6 h-full">
+<div class="bg-[#2E4540] rounded-3xl p-5 shadow-lg flex flex-col justify-between space-y-6 h-full border border-[#3b5952]">
     
     <div class="space-y-6">
-        {{-- Header Judul Utama Kontainer Kiri --}}
+        {{-- Header Judul Utama --}}
         <div class="pb-2 border-b border-[#3b5952]">
-            <h2 class="text-lg font-semibold text-brand-text">
+            <h2 class="text-lg font-semibold text-[#ededed]">
                 Input Transaksi Tiket & Data Wisatawan
             </h2>
         </div>
 
         {{-- Bagian Kategori Kendaraan --}}
         <div>
-            <label class="block text-sm font-semibold text-brand-text mb-3">
+            <label class="block text-sm font-semibold text-[#d1d5dc] mb-3">
                 Kategori Kendaraan
             </label>
             
             <div class="grid grid-cols-2 gap-4">
                 @php
-                    $kendaraan = [
+                    $KategoriKendaraan = [
                         ['id' => 'motor', 'label' => 'Motor (Roda 2)'],
                         ['id' => 'mobil', 'label' => 'Mobil (Roda 4)'],
                     ];
                 @endphp
 
-                @foreach ($kendaraan as $item)
+                @foreach ($KategoriKendaraan as $item)
                     <button type="button"
                             id="btn-{{ $item['id'] }}"
                             onclick="pilihKategori('{{ $item['id'] }}')"
-                            class="bg-[#408175] hover:bg-[#3aafa9] text-brand-text rounded-xl p-6 flex flex-col items-center justify-center text-center w-full transition duration-150 shadow-md">
-                        <span class="text-xl font-semibold text-[#d1d5dc]">{{ $item['label'] }}</span>
+                            class="bg-[#408175] hover:bg-[#3aafa9] focus:bg-[#3aafa9] focus:ring-4 focus:ring-amber-400 text-[#d1d5dc] rounded-xl p-5 flex flex-col items-center justify-center text-center w-full transition duration-150 shadow-md active:scale-95 outline-none border border-[#3b5952]">
+                        <span class="text-base font-bold text-[#d1d5dc]">{{ $item['label'] }}</span>
                     </button>
                 @endforeach
-
-                {{-- Tombol Motor --}}
-                {{-- <button type="button"
-                        id="btn-motor"
-                        onclick="pilihKategori('motor')"
-                        class="bg-[#408175] hover:bg-[#3aafa9] text-brand-text rounded-xl p-4 flex flex-col items-center justify-center text-center w-full transition duration-150 shadow-md">
-                    <img src="{{ asset('assets/icons/motorcycle.png') }}" class="w-10 h-10 object-contain mb-1" alt="Motor">
-                    <span class="text-xs font-semibold text-[#d1d5dc]">Motor</span>
-                </button> --}}
-
-                {{-- Tombol Mobil --}}
-                {{-- <button type="button"   
-                        id="btn-mobil"
-                        onclick="pilihKategori('mobil')"
-                        class="bg-[#408175] hover:bg-[#3aafa9] text-brand-text rounded-xl p-4 flex flex-col items-center justify-center text-center w-full transition duration-150 shadow-md">
-                    <img src="{{ asset('assets/icons/car.png') }}" class="w-10 h-10 object-contain mb-1" alt="Mobil">
-                    <span class="text-xs font-semibold text-[#d1d5dc]">Mobil</span>
-                </button> --}}
-                
             </div>
         </div>
 
@@ -59,43 +40,32 @@
             </label>
         
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                
-                {{-- 1. Lokal Bangka --}}
-                <div class="bg-[#243733] border border-[#3b5952] p-3 rounded-xl flex flex-col justify-between">
-                    <div class="mb-2">
-                        <span class="block text-xs font-semibold text-[#d1d5dc] text-center">Lokal Bangka</span>
-                    </div>
-                    <div class="flex items-center justify-between bg-[#1c2b28] rounded-lg p-1">
-                        <button type="button" class="w-7 h-7 rounded bg-[#2a3d38] text-[#d1d5dc] flex items-center justify-center font-bold text-sm hover:bg-[#3b544e] transition active:scale-95">-</button>
-                        <input type="number" value="0" min="0" readonly class="w-8 bg-transparent text-[#d1d5dc] text-center font-bold text-xs focus:outline-none">
-                        <button type="button" class="w-7 h-7 rounded bg-[#408175] text-[#d1d5dc] flex items-center justify-center font-bold text-sm hover:bg-[#4ea091] transition active:scale-95">+</button>
-                    </div>
-                </div>
+                @php
+                    $KategoriWisatawan = [
+                        ['id' => 'lokal', 'label' => 'Lokal Bangka'],
+                        ['id' => 'nusantara', 'label' => 'Nusantara'],
+                        ['id' => 'asing', 'label' => 'Mancanegara'],
+                    ];
+                @endphp
 
-                {{-- 2. Wisatawan Nusantara --}}
-                <div class="bg-[#243733] border border-[#3b5952] p-3 rounded-xl flex flex-col justify-between">
-                    <div class="mb-2">
-                        <span class="block text-xs font-semibold text-[#d1d5dc] text-center">Nusantara</span>
+                @foreach ($KategoriWisatawan as $wisatawan)
+                    <div class="bg-[#243733] border border-[#3b5952] p-3 rounded-xl flex flex-col justify-between shadow-inner">
+                        <div class="mb-2">
+                            <span class="block text-xs font-semibold text-[#d1d5dc] text-center">
+                                {{ $wisatawan['label'] }}
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between bg-[#1C2B28] rounded-lg p-1 border border-[#3b5952]">
+                            <button type="button" class="w-7 h-7 rounded bg-[#2a3d38] text-[#d1d5dc] flex items-center justify-center font-bold text-sm hover:bg-[#3b544e] transition active:scale-95">
+                                -
+                            </button>
+                            <input type="number" value="0" min="0" readonly class="w-8 bg-transparent text-[#d1d5dc] text-center font-bold text-xs focus:outline-none">
+                            <button type="button" class="w-7 h-7 rounded bg-[#408175] text-[#d1d5dc] flex items-center justify-center font-bold text-sm hover:bg-[#4ea091] transition active:scale-95">
+                                +
+                            </button>
+                        </div>
                     </div>
-                    <div class="flex items-center justify-between bg-[#1c2b28] rounded-lg p-1">
-                        <button type="button" class="w-7 h-7 rounded bg-[#2a3d38] text-[#d1d5dc] flex items-center justify-center font-bold text-sm hover:bg-[#3b544e] transition active:scale-95">-</button>
-                        <input type="number" value="0" min="0" readonly class="w-8 bg-transparent text-[#d1d5dc] text-center font-bold text-xs focus:outline-none">
-                        <button type="button" class="w-7 h-7 rounded bg-[#408175] text-[#d1d5dc] flex items-center justify-center font-bold text-sm hover:bg-[#4ea091] transition active:scale-95">+</button>
-                    </div>
-                </div>
-
-                {{-- 3. Wisatawan Asing --}}
-                <div class="bg-[#243733] border border-[#3b5952] p-3 rounded-xl flex flex-col justify-between">
-                    <div class="mb-2">
-                        <span class="block text-xs font-semibold text-[#d1d5dc] text-center">Mancanegara</span>
-                    </div>
-                    <div class="flex items-center justify-between bg-[#1c2b28] rounded-lg p-1">
-                        <button type="button" class="w-7 h-7 rounded bg-[#2a3d38] text-[#d1d5dc] flex items-center justify-center font-bold text-sm hover:bg-[#3b544e] transition active:scale-95">-</button>
-                        <input type="number" value="0" min="0" readonly class="w-8 bg-transparent text-[#d1d5dc] text-center font-bold text-xs focus:outline-none">
-                        <button type="button" class="w-7 h-7 rounded bg-[#408175] text-[#d1d5dc] flex items-center justify-center font-bold text-sm hover:bg-[#4ea091] transition active:scale-95">+</button>
-                    </div>
-                </div>
-
+                @endforeach
             </div>
         </div>
     </div>
@@ -104,10 +74,10 @@
     <div class="pt-4 border-t border-[#3b5952]">
         <div class="flex justify-between items-end mb-4">
             <div>
-                <span class="block text-xs text-text">Total Pembayaran</span>
-                <span class="text-2xl font-bold text-[#3aafa9]">Rp 22.000</span>
+                <span class="block text-xs text-[#ededed]">Total Pembayaran</span>
+                <span class="text-2xl font-bold text-[#3aafa9]">Rp 0</span>
             </div>
-            <span class="text-xs text-text">3 Pengunjung</span>
+            <span class="text-xs text-[#d1d5dc]">0 Pengunjung</span>
         </div>
 
         <button type="button" 
