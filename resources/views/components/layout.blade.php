@@ -8,7 +8,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="bg-[#0B0909] text-[#2E4540] font-sans antialiased">
+<body class="bg-[#0B0909] text-[#ededed] font-sans antialiased">
 
     <x-header-petugas></x-header-petugas>
 
