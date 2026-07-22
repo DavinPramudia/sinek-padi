@@ -1,9 +1,16 @@
 <div class="bg-[#2E4540] rounded-3xl p-5 shadow-lg flex flex-col justify-between space-y-6 h-full">
     
     <div class="space-y-6">
+        {{-- Header Judul Utama Kontainer Kiri --}}
+        <div class="pb-2 border-b border-[#3b5952]">
+            <h2 class="text-lg font-semibold text-[#EDEDED]">
+                Input Transaksi Tiket & Data Wisatawan
+            </h2>
+        </div>
+
         {{-- Bagian Kategori Kendaraan --}}
         <div>
-            <label class="block text-xl font-semibold text-[#EDEDED] mb-3">
+            <label class="block text-sm font-semibold text-[#d1d5dc] mb-3">
                 Kategori Kendaraan
             </label>
             
@@ -14,7 +21,7 @@
                         onclick="pilihKategori('motor')"
                         class="bg-[#408175] hover:bg-[#3aafa9] text-[#EDEDED] rounded-xl p-4 flex flex-col items-center justify-center text-center w-full transition duration-150 shadow-md">
                     <img src="{{ asset('assets/icons/motorcycle.png') }}" class="w-10 h-10 object-contain mb-1" alt="Motor">
-                    <span class="text-xs font-semibold">Motor</span>
+                    <span class="text-xs font-semibold text-[#d1d5dc]">Motor</span>
                 </button>
 
                 {{-- Tombol Mobil --}}
@@ -23,14 +30,14 @@
                         onclick="pilihKategori('mobil')"
                         class="bg-[#408175] hover:bg-[#3aafa9] text-[#EDEDED] rounded-xl p-4 flex flex-col items-center justify-center text-center w-full transition duration-150 shadow-md">
                     <img src="{{ asset('assets/icons/car.png') }}" class="w-10 h-10 object-contain mb-1" alt="Mobil">
-                    <span class="text-xs font-semibold">Mobil</span>
+                    <span class="text-xs font-semibold text-[#d1d5dc]">Mobil</span>
                 </button>
             </div>
         </div>
 
         {{-- Bagian Kategori Wisatawan --}}
         <div>
-            <label class="block text-lg font-semibold text-[#EDEDED] mb-3">
+            <label class="block text-sm font-semibold text-[#d1d5dc] mb-3">
                 Kategori Wisatawan
             </label>
         
@@ -39,36 +46,36 @@
                 {{-- 1. Lokal Bangka --}}
                 <div class="bg-[#243733] border border-[#3b5952] p-3 rounded-xl flex flex-col justify-between">
                     <div class="mb-2">
-                        <span class="block text-xs font-semibold text-[#EDEDED] text-center">Lokal Bangka</span>
+                        <span class="block text-xs font-semibold text-[#d1d5dc] text-center">Lokal Bangka</span>
                     </div>
                     <div class="flex items-center justify-between bg-[#1c2b28] rounded-lg p-1">
-                        <button type="button" class="w-7 h-7 rounded bg-[#2a3d38] text-white flex items-center justify-center font-bold text-sm hover:bg-[#3b544e] transition active:scale-95">-</button>
-                        <input type="number" value="0" min="0" readonly class="w-8 bg-transparent text-white text-center font-bold text-xs focus:outline-none">
-                        <button type="button" class="w-7 h-7 rounded bg-[#408175] text-white flex items-center justify-center font-bold text-sm hover:bg-[#4ea091] transition active:scale-95">+</button>
+                        <button type="button" class="w-7 h-7 rounded bg-[#2a3d38] text-[#d1d5dc] flex items-center justify-center font-bold text-sm hover:bg-[#3b544e] transition active:scale-95">-</button>
+                        <input type="number" value="0" min="0" readonly class="w-8 bg-transparent text-[#d1d5dc] text-center font-bold text-xs focus:outline-none">
+                        <button type="button" class="w-7 h-7 rounded bg-[#408175] text-[#d1d5dc] flex items-center justify-center font-bold text-sm hover:bg-[#4ea091] transition active:scale-95">+</button>
                     </div>
                 </div>
 
                 {{-- 2. Wisatawan Nusantara --}}
                 <div class="bg-[#243733] border border-[#3b5952] p-3 rounded-xl flex flex-col justify-between">
                     <div class="mb-2">
-                        <span class="block text-xs font-semibold text-[#EDEDED] text-center">Nusantara</span>
+                        <span class="block text-xs font-semibold text-[#d1d5dc] text-center">Nusantara</span>
                     </div>
                     <div class="flex items-center justify-between bg-[#1c2b28] rounded-lg p-1">
-                        <button type="button" class="w-7 h-7 rounded bg-[#2a3d38] text-white flex items-center justify-center font-bold text-sm hover:bg-[#3b544e] transition active:scale-95">-</button>
-                        <input type="number" value="0" min="0" readonly class="w-8 bg-transparent text-white text-center font-bold text-xs focus:outline-none">
-                        <button type="button" class="w-7 h-7 rounded bg-[#408175] text-white flex items-center justify-center font-bold text-sm hover:bg-[#4ea091] transition active:scale-95">+</button>
+                        <button type="button" class="w-7 h-7 rounded bg-[#2a3d38] text-[#d1d5dc] flex items-center justify-center font-bold text-sm hover:bg-[#3b544e] transition active:scale-95">-</button>
+                        <input type="number" value="0" min="0" readonly class="w-8 bg-transparent text-[#d1d5dc] text-center font-bold text-xs focus:outline-none">
+                        <button type="button" class="w-7 h-7 rounded bg-[#408175] text-[#d1d5dc] flex items-center justify-center font-bold text-sm hover:bg-[#4ea091] transition active:scale-95">+</button>
                     </div>
                 </div>
 
                 {{-- 3. Wisatawan Asing --}}
                 <div class="bg-[#243733] border border-[#3b5952] p-3 rounded-xl flex flex-col justify-between">
                     <div class="mb-2">
-                        <span class="block text-xs font-semibold text-[#EDEDED] text-center">Mancanegara</span>
+                        <span class="block text-xs font-semibold text-[#d1d5dc] text-center">Mancanegara</span>
                     </div>
                     <div class="flex items-center justify-between bg-[#1c2b28] rounded-lg p-1">
-                        <button type="button" class="w-7 h-7 rounded bg-[#2a3d38] text-white flex items-center justify-center font-bold text-sm hover:bg-[#3b544e] transition active:scale-95">-</button>
-                        <input type="number" value="0" min="0" readonly class="w-8 bg-transparent text-white text-center font-bold text-xs focus:outline-none">
-                        <button type="button" class="w-7 h-7 rounded bg-[#408175] text-white flex items-center justify-center font-bold text-sm hover:bg-[#4ea091] transition active:scale-95">+</button>
+                        <button type="button" class="w-7 h-7 rounded bg-[#2a3d38] text-[#d1d5dc] flex items-center justify-center font-bold text-sm hover:bg-[#3b544e] transition active:scale-95">-</button>
+                        <input type="number" value="0" min="0" readonly class="w-8 bg-transparent text-[#d1d5dc] text-center font-bold text-xs focus:outline-none">
+                        <button type="button" class="w-7 h-7 rounded bg-[#408175] text-[#d1d5dc] flex items-center justify-center font-bold text-sm hover:bg-[#4ea091] transition active:scale-95">+</button>
                     </div>
                 </div>
 
