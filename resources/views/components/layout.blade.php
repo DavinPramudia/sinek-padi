@@ -5,17 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'Sinek Padi - Form Petugas' }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        input[type="number"] { -moz-appearance: textfield; }
-    </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="bg-[#0B0909] text-[#EDEDED] font-sans antialiased">
+<body class="bg-brand-body text-brand-text font-sans antialiased">
 
     <x-header-petugas></x-header-petugas>
 

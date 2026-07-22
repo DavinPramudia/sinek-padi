@@ -1,37 +1,54 @@
-<div class="bg-[#2E4540] rounded-3xl p-5 shadow-lg flex flex-col justify-between space-y-6 h-full">
+<div class="bg-brand-card rounded-3xl p-5 shadow-lg flex flex-col justify-between space-y-6 h-full">
     
     <div class="space-y-6">
         {{-- Header Judul Utama Kontainer Kiri --}}
         <div class="pb-2 border-b border-[#3b5952]">
-            <h2 class="text-lg font-semibold text-[#EDEDED]">
+            <h2 class="text-lg font-semibold text-brand-text">
                 Input Transaksi Tiket & Data Wisatawan
             </h2>
         </div>
 
         {{-- Bagian Kategori Kendaraan --}}
         <div>
-            <label class="block text-sm font-semibold text-[#d1d5dc] mb-3">
+            <label class="block text-sm font-semibold text-brand-text mb-3">
                 Kategori Kendaraan
             </label>
             
             <div class="grid grid-cols-2 gap-4">
+                @php
+                    $kendaraan = [
+                        ['id' => 'motor', 'label' => 'Motor', 'icon' => 'motorcycle.png'],
+                        ['id' => 'mobil', 'label' => 'Mobil', 'icon' => 'car.png'],
+                    ];
+                @endphp
+
+                @foreach ($kendaraan as $item)
+                    <button type="button"
+                            id="btn-{{ $item['id'] }}"
+                            onclick="pilihKategori('{{ $item['id'] }}')"
+                            class="bg-[#408175] hover:bg-[#3aafa9] text-brand-text rounded-xl p-4 flex flex-col items-center justify-center text-center w-full transition duration-150 shadow-md">
+                        <img src="{{ asset('assets/icons/' . $item['icon']) }}" class="w-10 h-10 object-contain mb-1" alt="{{ $item['label'] }}">
+                        <span class="text-xs font-semibold text-[#d1d5dc]">{{ $item['label'] }}</span>
+                    </button>
+
                 {{-- Tombol Motor --}}
-                <button type="button"
+                {{-- <button type="button"
                         id="btn-motor"
                         onclick="pilihKategori('motor')"
-                        class="bg-[#408175] hover:bg-[#3aafa9] text-[#EDEDED] rounded-xl p-4 flex flex-col items-center justify-center text-center w-full transition duration-150 shadow-md">
+                        class="bg-[#408175] hover:bg-[#3aafa9] text-brand-text rounded-xl p-4 flex flex-col items-center justify-center text-center w-full transition duration-150 shadow-md">
                     <img src="{{ asset('assets/icons/motorcycle.png') }}" class="w-10 h-10 object-contain mb-1" alt="Motor">
                     <span class="text-xs font-semibold text-[#d1d5dc]">Motor</span>
-                </button>
+                </button> --}}
 
                 {{-- Tombol Mobil --}}
-                <button type="button"   
+                {{-- <button type="button"   
                         id="btn-mobil"
                         onclick="pilihKategori('mobil')"
-                        class="bg-[#408175] hover:bg-[#3aafa9] text-[#EDEDED] rounded-xl p-4 flex flex-col items-center justify-center text-center w-full transition duration-150 shadow-md">
+                        class="bg-[#408175] hover:bg-[#3aafa9] text-brand-text rounded-xl p-4 flex flex-col items-center justify-center text-center w-full transition duration-150 shadow-md">
                     <img src="{{ asset('assets/icons/car.png') }}" class="w-10 h-10 object-contain mb-1" alt="Mobil">
                     <span class="text-xs font-semibold text-[#d1d5dc]">Mobil</span>
-                </button>
+                </button> --}}
+                
             </div>
         </div>
 
@@ -87,10 +104,10 @@
     <div class="pt-4 border-t border-[#3b5952]">
         <div class="flex justify-between items-end mb-4">
             <div>
-                <span class="block text-xs text-[#EDEDED]">Total Pembayaran</span>
+                <span class="block text-xs text-text">Total Pembayaran</span>
                 <span class="text-2xl font-bold text-[#3aafa9]">Rp 22.000</span>
             </div>
-            <span class="text-xs text-[#EDEDED]">3 Pengunjung</span>
+            <span class="text-xs text-text">3 Pengunjung</span>
         </div>
 
         <button type="button" 
