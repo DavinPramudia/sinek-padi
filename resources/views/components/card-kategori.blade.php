@@ -1,4 +1,4 @@
-<div class="bg-[#2E4540] rounded-3xl p-5 shadow-lg flex flex-col justify-between space-y-6 h-full border border-[#3b5952]">
+<div x-data="loketTransaksi()" class="bg-[#2E4540] rounded-3xl p-5 shadow-lg flex flex-col justify-between space-y-6 h-full border border-[#3b5952]">
     
     <div class="space-y-6">
         {{-- Header Judul Utama --}}
@@ -24,9 +24,9 @@
 
                 @foreach ($KategoriKendaraan as $item)
                     <button type="button"
-                            id="btn-{{ $item['id'] }}"
-                            onclick="pilihKategori('{{ $item['id'] }}')"
-                            class="bg-[#408175] hover:bg-[#3aafa9] focus:bg-[#3aafa9] focus:ring-4 focus:ring-amber-400 text-[#d1d5dc] rounded-xl p-5 flex flex-col items-center justify-center text-center w-full transition duration-150 shadow-md active:scale-95 outline-none border border-[#3b5952]">
+                            @click="kategoriKendaraan = '{{ $item['id'] }}'"
+                            :class="kategoriKendaraan === '{{ $item['id'] }}' ? '!bg-[#3aafa9] ring-4 ring-amber-400 font-bold' : 'bg-[#408175]'"
+                            class="hover:bg-[#3aafa9] text-[#d1d5dc] rounded-xl p-5 flex flex-col items-center justify-center text-center w-full transition duration-150 shadow-md active:scale-95 outline-none border border-[#3b5952]">
                         <span class="text-base font-bold text-[#d1d5dc]">{{ $item['label'] }}</span>
                     </button>
                 @endforeach
@@ -56,11 +56,14 @@
                             </span>
                         </div>
                         <div class="flex items-center justify-between bg-[#1C2B28] rounded-lg p-1 border border-[#3b5952]">
-                            <button type="button" class="w-7 h-7 rounded bg-[#2a3d38] text-[#d1d5dc] flex items-center justify-center font-bold text-sm hover:bg-[#3b544e] transition active:scale-95">
+                            <button type="button" @click="kurang('{{ $wisatawan['id'] }}')" class="w-7 h-7 rounded bg-[#2a3d38] text-[#d1d5dc] flex items-center justify-center font-bold text-sm hover:bg-[#3b544e] transition active:scale-95">
                                 -
                             </button>
-                            <input type="number" value="0" min="0" readonly class="w-8 bg-transparent text-[#d1d5dc] text-center font-bold text-xs focus:outline-none">
-                            <button type="button" class="w-7 h-7 rounded bg-[#408175] text-[#d1d5dc] flex items-center justify-center font-bold text-sm hover:bg-[#4ea091] transition active:scale-95">
+                            
+                            {{-- Menggunakan span agar angkanya muncul reaktif tanpa merusak desain kotak input --}}
+                            <span class="w-8 bg-transparent text-[#d1d5dc] text-center font-bold text-xs flex items-center justify-center" x-text="qty.{{ $wisatawan['id'] }}">0</span>
+                            
+                            <button type="button" @click="tambah('{{ $wisatawan['id'] }}')" class="w-7 h-7 rounded bg-[#408175] text-[#d1d5dc] flex items-center justify-center font-bold text-sm hover:bg-[#4ea091] transition active:scale-95">
                                 +
                             </button>
                         </div>
@@ -75,9 +78,9 @@
         <div class="flex justify-between items-end mb-4">
             <div>
                 <span class="block text-xs text-[#ededed]">Total Pembayaran</span>
-                <span class="text-2xl font-bold text-[#3aafa9]">Rp 0</span>
+                <span class="text-2xl font-bold text-[#3aafa9]" x-text="formatRupiah(totalBayar)">Rp 0</span>
             </div>
-            <span class="text-xs text-[#d1d5dc]">0 Pengunjung</span>
+            <span class="text-xs text-[#d1d5dc]"><span x-text="totalPengunjung">0</span> Pengunjung</span>
         </div>
 
         <button type="button" 
