@@ -78,7 +78,7 @@
         <div class="flex justify-between items-end mb-4">
             <div>
                 <span class="block text-xs text-[#ededed]">Total Pembayaran</span>
-                <span class="text-2xl font-bold text-[#3aafa9]" x-text="formatRupiah(totalBayar)">Rp 0</span>
+                <span class="text-2xl font-bold text-[#3aafa9]" x-text="formatRupiah(totalBayar)"></span>
             </div>
             <span class="text-xs text-[#d1d5dc]"><span x-text="totalPengunjung">0</span> Pengunjung</span>
         </div>

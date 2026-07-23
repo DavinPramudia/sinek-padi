@@ -1,9 +1,17 @@
 document.addEventListener('alpine:init', () => {
     Alpine.data('loketTransaksi', () => ({
-        kategoriKendaraan: 'motor',
-        tarifkendaraan: { motor: 2000, mobil: 4000 },
+        kategoriKendaraan: '', 
+        
+        tarifKendaraan: { 
+            motor: 2000, 
+            mobil: 4000 
+        },
 
-        qty: { lokal: 0, nusantara: 0, asing: 0 },
+        qty: { 
+            lokal: 0, 
+            nusantara: 0, 
+            asing: 0 
+        },
 
         tambah(kategori) {
             this.qty[kategori]++;
@@ -20,8 +28,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         get totalBayar() {
-            let tarif = this.tarifkendaraan[this.kategoriKendaraan] || 0;
-            return tarif * this.totalPengunjung;
+            return this.tarifKendaraan[this.kategoriKendaraan] || 0;
         },
 
         formatRupiah(angka) {
