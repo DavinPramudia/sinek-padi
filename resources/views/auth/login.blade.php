@@ -49,7 +49,7 @@
 
                     {{-- Input Username --}}
                     <div class="space-y-1">
-                        <label class="block text-sm font-semibold text-[#d1d5dc]">Username / Email</label>
+                        <label class="block text-sm font-semibold text-[#d1d5dc]">Username</label>
                         <div class="relative flex items-center">
                             
                             <span class="absolute left-3 text-[#d1d5dc] pointer-events-none">
@@ -58,7 +58,7 @@
                                 </svg>
                             </span>
 
-                            <input type="text" name="email" required 
+                            <input type="text" name="username" required 
                                 class="w-full bg-[#1C2B28] border border-[#3b5952] rounded-xl pl-10 pr-4 py-3 text-sm text-[#ededed] focus:outline-none focus:border-[#3aafa9] transition">
                         </div>
                     </div>

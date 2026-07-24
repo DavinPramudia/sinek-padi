@@ -14,6 +14,7 @@ return new class extends Migration
         // 1. Tabel Users Custom milikmu
         Schema::create('users', function (Blueprint $table) {
             $table->id('id_users'); 
+            $table->string('name');
             $table->string('username')->unique(); 
             $table->string('password');
 
