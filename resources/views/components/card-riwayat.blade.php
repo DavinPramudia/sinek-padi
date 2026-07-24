@@ -1,6 +1,6 @@
 <div class="bg-[#2E4540] rounded-3xl p-5 shadow-lg border border-[#3b5952] space-y-4">
     
-    {{-- Header Tabel Riwayat --}}
+    {{-- Header Tabel Riwayat --}} 
     <div class="flex justify-between items-center pb-3 border-b border-[#3b5952]">
         <h2 class="text-lg font-semibold text-[#EDEDED]">
             Riwayat Transaksi Terakhir

@@ -10,3 +10,7 @@ Route::get('/', function () {
 Route::get('/petugas/loket', function () {
     return view('petugas.loket');
 });
+
+Route::get('/login', function() {
+    return view('login');
+});
