@@ -44,8 +44,8 @@
                 </div>
 
                 {{-- Form Login --}}
-                {{-- <form action="{{ route('login.process') }}" method="POST" class="space-y-4">
-                    @csrf --}}
+                    <form action="{{ route('login.process') }}" method="POST" class="space-y-4">
+                        @csrf
 
                     {{-- Input Username --}}
                     <div class="space-y-1">
