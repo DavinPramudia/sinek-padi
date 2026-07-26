@@ -47,6 +47,14 @@
                     <form action="{{ route('login.process') }}" method="POST" class="space-y-4">
                         @csrf
 
+                        @if ($errors->any())
+                            <div class="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-xl text-sm space-y-1">
+                                @foreach ($errors->all() as $error)
+                                    <p>⚠️ {{ $error }}</p>
+                                @endforeach
+                            </div>
+                        @endif
+
                     {{-- Input Username --}}
                     <div class="space-y-1">
                         <label class="block text-sm font-semibold text-[#d1d5dc]">Username</label>

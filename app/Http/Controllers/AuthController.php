@@ -16,33 +16,35 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        // 1. Validasi input
         $request->validate([
             'username' => ['required'], 
             'password' => ['required'],
         ]);
 
+        // 2. Cari user berdasarkan username
         $user = User::where('username', $request->username)->first();
 
-        // Karena tadi hasilnya "ADA" dan "YA", ini pasti tembus!
+        // 3. Cek apakah user ada dan passwordnya cocok
         if ($user && Hash::check($request->password, $user->password)) {
             
-            // Login-kan user secara resmi ke sistem Laravel
+            // Catat login & buat session baru
             Auth::login($user);
-            
-            // Regenerate session agar aman dan terbaca oleh middleware auth
             $request->session()->regenerate();
-
-            // Arahkan sesuai role
+            
+            // Arahkan sesuai id_roles
             if ($user->id_roles == 1) {
                 return redirect()->intended('/admin/dashboard');
             } elseif ($user->id_roles == 2) {
                 return redirect()->intended('/petugas/loket');
             }
 
+            // Jika role di luar 1 atau 2, keluarkan lagi
             Auth::logout();
             return back()->withErrors(['username' => 'Role akun tidak terdaftar.']);
         }
 
+        // Jika gagal login
         return back()->withErrors([
             'username' => 'Username atau password salah.',
         ])->onlyInput('username');
