@@ -1,48 +1,62 @@
-<div x-show="openPrintModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" style="display: none;">
-    
-    <div class="bg-[#1C2B28] border border-[#3b5952] p-6 rounded-xl shadow-xl max-w-md w-full text-center space-y-4">
+{{-- resources/views/components/print-modal.blade.php --}}
+<div x-show="openPrintModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div class="bg-gray-800 border border-gray-700 p-6 rounded-xl shadow-xl max-w-sm w-full text-center space-y-4">
         
         <h3 class="text-lg font-semibold text-white">Konfirmasi & Cetak Tiket</h3>
         
         {{-- TAHAP 1: PILIH METODE --}}
-        <div x-show="tahap === 'pilih'" class="space-y-4 py-2">
+        <div x-show="tahap === 'pilih'" class="space-y-4">
             <p class="text-sm text-gray-300">Pilih metode output tiket:</p>
             
+            {{-- Kotak Pilihan --}}
             <div class="grid grid-cols-2 gap-3">
                 <button @click="metodePilihan = 'e-ticket'" type="button" 
-                        :class="metodePilihan === 'e-ticket' ? 'bg-[#3aafa9] text-black font-bold' : 'bg-[#243733] text-white'" 
-                        class="p-4 border border-[#3b5952] rounded-xl flex flex-col items-center justify-center space-y-2">
+                        :class="metodePilihan === 'e-ticket' ? 'bg-blue-600 text-white font-bold ring-2 ring-white/30' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'" 
+                        class="p-4 border border-gray-600 rounded-xl flex flex-col items-center justify-center transition cursor-pointer">
                     <span>📱 E-Ticket</span>
                 </button>
-
                 <button @click="metodePilihan = 'print'" type="button" 
-                        :class="metodePilihan === 'print' ? 'bg-[#3aafa9] text-black font-bold' : 'bg-[#243733] text-white'" 
-                        class="p-4 border border-[#3b5952] rounded-xl flex flex-col items-center justify-center space-y-2">
+                        :class="metodePilihan === 'print' ? 'bg-blue-600 text-white font-bold ring-2 ring-white/30' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'" 
+                        class="p-4 border border-gray-600 rounded-xl flex flex-col items-center justify-center transition cursor-pointer">
                     <span>🖨️ Print Fisik</span>
                 </button>
             </div>
 
-            <div class="flex justify-between space-x-3 pt-4 border-t border-[#3b5952]">
-                <button @click="openPrintModal = false" type="button" class="px-4 py-2 bg-red-600 text-white rounded-lg">Batal</button>
-                <button @click="simpanDanCetak()" type="button" class="px-5 py-2 bg-[#3aafa9] text-black font-bold rounded-lg">Simpan & Proses</button>
+            {{-- Wadah Tombol Bawah (Persis seperti modal logout) --}}
+            <div class="flex justify-center space-x-3 pt-2">
+                {{-- Tombol Batal --}}
+                <button @click="openPrintModal = false" type="button" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded-lg transition cursor-pointer">
+                    Batal
+                </button>
+                
+                {{-- Tombol Eksekusi (Simpan) --}}
+                <button @click="simpanDanCetak()" type="button" class="px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm rounded-lg transition cursor-pointer">
+                    Simpan & Proses
+                </button>
             </div>
         </div>
 
         {{-- TAHAP 2: PROSES / LOADING --}}
         <div x-show="tahap === 'proses'" class="space-y-3 py-6">
-            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#3aafa9] mx-auto"></div>
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-white mx-auto"></div>
             <p class="text-sm text-gray-300">Menyimpan data ke sistem...</p>
         </div>
 
         {{-- TAHAP 3: SUKSES --}}
-        <div x-show="tahap === 'sukses'" class="space-y-3 py-4">
-            <div class="text-green-400 text-4xl mb-2">✔️</div>
-            <h4 class="text-md font-bold text-white">Transaksi Berhasil!</h4>
-            <p class="text-sm text-gray-300">Data sudah tersimpan.</p>
+        <div x-show="tahap === 'sukses'" class="space-y-4">
+            <div class="text-green-400 text-5xl mb-2">✔️</div>
+            <p class="text-sm text-gray-300">Transaksi berhasil disimpan.</p>
             
-            <button @click="resetForm()" type="button" class="w-full mt-4 py-3 bg-[#408175] text-white font-bold rounded-xl">
-                Tutup & Layani Berikutnya
-            </button>
+            {{-- Wadah Tombol Bawah (Persis seperti modal logout) --}}
+            <div class="flex justify-center space-x-3 pt-2">
+                <button @click="resetForm()" type="button" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded-lg transition cursor-pointer">
+                    Tutup
+                </button>
+                
+                <a :href="urlCetak" target="_blank" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded-lg transition cursor-pointer">
+                    🖨️ Cetak Tiket
+                </a>
+            </div>
         </div>
 
     </div>

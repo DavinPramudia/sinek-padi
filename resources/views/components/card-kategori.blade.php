@@ -71,9 +71,11 @@
         </div>
 
         <button type="button" 
-                @click="openPrintModal()"
+                @click="bukaModal()"
                 class="w-full bg-[#408175] hover:bg-[#3aafa9] active:scale-95 text-white font-bold py-3.5 rounded-xl shadow-lg transition duration-150 flex items-center justify-center space-x-2">
             <span>Cetak Tiket & Bayar</span>
         </button>
     </div>
+    <x-print-modal />
+    <x-alert-modal />
 </div>

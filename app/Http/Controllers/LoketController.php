@@ -81,6 +81,22 @@ class LoketController extends Controller
             'updated_at'    => now(),
         ]);
 
+        if ($request->has('qty_wisatawan')) {
+            foreach ($request->qty_wisatawan as $idKategoriWisatawan => $jumlah) {
+                // Hanya simpan yang jumlahnya lebih dari 0
+                if ($jumlah > 0) {
+                    DB::table('detail_transaksis')->insert([
+                        'id_transaksi'          => $transaksiId, // ID dari transaksi yang baru saja dibuat di atas
+                        'id_kategori_wisatawan' => $idKategoriWisatawan,
+                        'jumlah_pengunjung'     => $jumlah,
+                        'created_at'            => now(),
+                        'updated_at'            => now(),
+                    ]);
+                }
+            }
+        }
+        // ========================================================
+
         // 3. Kembalikan respons sukses ke Alpine.js
         return response()->json([
             'status'    => 'sukses',
