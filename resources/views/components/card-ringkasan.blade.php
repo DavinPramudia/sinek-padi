@@ -16,25 +16,33 @@
         {{-- Box 1: Total Pendapatan --}}
         <div class="bg-[#1c2b28] p-3.5 rounded-xl border border-[#3b5952] flex flex-col justify-between">
             <span class="block text-[11px] text-[#d1d5dc]">Total Pendapatan</span>
-            <span class="text-base font-bold text-[#EDEDED] mt-1">Rp 1.450.000</span>
+            <span class="text-base font-bold text-[#EDEDED] mt-1">
+                Rp {{ number_format($totalPendapatan ?? 0, 0, ',', '.') }}
+            </span>
         </div>
 
         {{-- Box 2: Total Tiket --}}
         <div class="bg-[#1c2b28] p-3.5 rounded-xl border border-[#3b5952] flex flex-col justify-between">
             <span class="block text-[11px] text-[#d1d5dc]">Tiket Terbit</span>
-            <span class="text-base font-bold text-[#EDEDED] mt-1">128 <span class="text-xs font-normal text-[#d1d5dc]">Tiket</span></span>
+            <span class="text-base font-bold text-[#EDEDED] mt-1">
+                {{ $totalTiket ?? 0 }} <span class="text-xs font-normal text-[#d1d5dc]">Tiket</span>
+            </span>
         </div>
 
         {{-- Box 3: Total Motor --}}
         <div class="bg-[#1c2b28] p-3.5 rounded-xl border border-[#3b5952] flex flex-col justify-between">
             <span class="block text-[11px] text-[#d1d5dc]">Total Motor</span>
-            <span class="text-base font-bold text-[#EDEDED] mt-1">85 <span class="text-xs font-normal text-[#d1d5dc]">Motor</span></span>
+            <span class="text-base font-bold text-[#EDEDED] mt-1">
+                {{ $totalMotor ?? 0 }} <span class="text-xs font-normal text-[#d1d5dc]">Motor</span>
+            </span>
         </div>
 
         {{-- Box 4: Total Mobil --}}
         <div class="bg-[#1c2b28] p-3.5 rounded-xl border border-[#3b5952] flex flex-col justify-between">
             <span class="block text-[11px] text-[#d1d5dc]">Total Mobil</span>
-            <span class="text-base font-bold text-[#EDEDED] mt-1">43 <span class="text-xs font-normal text-[#d1d5dc]">Mobil</span></span>
+            <span class="text-base font-bold text-[#EDEDED] mt-1">
+                {{ $totalMobil ?? 0 }} <span class="text-xs font-normal text-[#d1d5dc]">Mobil</span>
+            </span>
         </div>
 
         {{-- Box 5: Total Wisatawan --}}
@@ -43,7 +51,9 @@
                 <span class="block text-[11px] text-[#d1d5dc]">Total Wisatawan Hari Ini</span>
                 <span class="text-xs text-[#d1d5dc]">Lokal, Nusantara & Mancanegara</span>
             </div>
-            <span class="text-xl font-bold text-[#3aafa9]">128 <span class="text-xs font-normal text-[#d1d5dc]">Pengunjung</span></span>
+            <span class="text-xl font-bold text-[#3aafa9]">
+                {{ $totalTiket ?? 0 }} <span class="text-xs font-normal text-[#d1d5dc]">Pengunjung</span>
+            </span>
         </div>
 
     </div>

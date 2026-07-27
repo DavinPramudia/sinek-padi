@@ -10,7 +10,7 @@ class Transaksi extends Model
 {
     protected $table = 'transaksis'; 
     protected $primaryKey = 'id_transaksi'; 
-    protected $fillable = ['no_karcis', 'total_bayar', 'waktu', 'id_users', 'id_tarif']; 
+    protected $fillable = ['no_karcis', 'total_bayar', 'waktu', 'id_users', 'id_tarif','reprint_count','metode_cetak']; 
 
     public function user(): BelongsTo
     {

@@ -16,7 +16,12 @@ return new class extends Migration
             $table->string('no_karcis')->unique();
             $table->bigInteger('total_bayar');
             $table->dateTime('waktu');
+            
+            // Kolom tambahan sesuai fitur yang kita bahas
+            $table->integer('reprint_count')->default(0); // Untuk mencatat jumlah print ulang
+            $table->string('metode_cetak')->default('print'); // e-ticket atau print fisik
 
+            // Foreign Key
             $table->foreignId('id_users')->constrained('users', 'id_users')->onDelete('cascade');
             $table->foreignId('id_tarif')->constrained('tarifs', 'id_tarif')->onDelete('cascade');
 
