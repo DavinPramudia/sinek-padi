@@ -1,5 +1,5 @@
 {{-- MODAL PERINGATAN (ALERT) --}}
-<div x-show="openAlertModal" x-cloak class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+<div x-show="openAlertModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
     <div class="bg-gray-800 border border-gray-700 p-6 rounded-xl shadow-xl max-w-sm w-full text-center space-y-4">
         
         {{-- Ikon Peringatan --}}

@@ -1,4 +1,4 @@
-<nav class="bg-[#0B0909] border-b border-[#EDEDED] py-1 px-6 flex justify-between items-center">
+<nav class="bg-[#0B0909] border-b border-[#EDEDED] py-1 px-6 flex justify-between items-center sticky top-0 z-50">
     {{-- Kiri --}}
     <div class="flex items-center space-x-0">
         <span class="font-bold text-xl text-[#EDEDED]">Sinek Padi</span>
