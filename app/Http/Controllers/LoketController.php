@@ -39,14 +39,27 @@ class LoketController extends Controller
             ->where('id_tarif', 2) 
             ->count();
 
-        // 5. Kirim semua variabel ke view loket
+        // =========================================================
+        // TAMBAHAN BARU: 5. Ambil data Riwayat Transaksi di sini
+        // =========================================================
+        $riwayatTransaksi = DB::table('transaksis')
+            ->join('tarifs', 'transaksis.id_tarif', '=', 'tarifs.id_tarif')
+            ->join('kendaraans', 'tarifs.id_kendaraan', '=', 'kendaraans.id_kendaraan')
+            ->select('transaksis.*', 'kendaraans.nama_kendaraan')
+            ->whereDate('transaksis.created_at', today())
+            ->orderBy('transaksis.waktu', 'desc')
+            ->limit(5) // Membatasi hanya 5 transaksi terakhir
+            ->get();
+
+        // 6. Kirim semua variabel ke view loket
         return view('petugas.loket', compact(
             'KategoriKendaraan', 
             'KategoriWisatawan', 
             'totalPendapatan', 
             'totalTiket', 
             'totalMotor', 
-            'totalMobil'
+            'totalMobil',
+            'riwayatTransaksi' // <--- PASTIKAN INI IKUT DITAMBAHKAN
         ));
     }
 

@@ -70,13 +70,10 @@
             <span class="text-xs text-[#d1d5dc]"><span x-text="totalPengunjung">0</span> Pengunjung</span>
         </div>
 
-        {{-- UBAH DISINI: Ganti jadi fungsi simpanDanCetak(), serta tambahkan efek loading --}}
         <button type="button" 
-                @click="simpanDanCetak()"
-                :disabled="isLoading"
-                :class="isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#3aafa9] active:scale-95'"
-                class="w-full bg-[#408175] text-white font-bold py-3.5 rounded-xl shadow-lg transition duration-150 flex items-center justify-center space-x-2">
-            <span x-text="isLoading ? 'Memproses...' : 'Cetak Tiket & Bayar'"></span>
+                @click="openPrintModal()"
+                class="w-full bg-[#408175] hover:bg-[#3aafa9] active:scale-95 text-white font-bold py-3.5 rounded-xl shadow-lg transition duration-150 flex items-center justify-center space-x-2">
+            <span>Cetak Tiket & Bayar</span>
         </button>
     </div>
 </div>

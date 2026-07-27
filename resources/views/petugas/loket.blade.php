@@ -11,6 +11,6 @@
 
     </div> 
 
-    <x-card-riwayat />
+    <x-card-riwayat :riwayat-transaksi="$riwayatTransaksi" />
 
 </x-layout>
