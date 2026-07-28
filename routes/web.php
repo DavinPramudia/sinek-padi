@@ -21,7 +21,7 @@ Route::middleware(['auth'])->group(function () {
     // 2. Halaman Admin
     Route::get('/admin/dashboard', function () {
         return view('admin.dashboard');
-    });
+    })->name('admin.dashboard');
 
     // 3. Route untuk menyimpan transaksi
     Route::post('/transaksi/store', [LoketController::class, 'store'])->name('transaksi.store');
@@ -29,4 +29,13 @@ Route::middleware(['auth'])->group(function () {
     // 4. Route untuk cetak karcis
     Route::get('/transaksi/cetak/{id}', [LoketController::class, 'cetak'])->name('transaksi.cetak');
     
+    Route::get('/admin/laporan', function () { 
+        return "Halaman Laporan Transaksi"; })->name('admin.laporan');
+    
+    Route::get('/admin/akun', function () { 
+        return "Halaman Manajemen Akun"; })->name('admin.akun');
+    
+    Route::get('/admin/pengaturan', function () { 
+        return "Halaman Pengaturan"; })->name('admin.pengaturan');
+    // -------------------------------------------------------------
 });
