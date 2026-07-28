@@ -52,7 +52,7 @@
                 <span class="text-xs text-[#d1d5dc]">Lokal, Nusantara & Mancanegara</span>
             </div>
             <span class="text-xl font-bold text-[#3aafa9]">
-                {{ $totalTiket ?? 0 }} <span class="text-xs font-normal text-[#d1d5dc]">Pengunjung</span>
+                {{ $totalWisatawan ?? 0 }} <span class="text-xs font-normal text-[#d1d5dc]">Pengunjung</span>
             </span>
         </div>
 

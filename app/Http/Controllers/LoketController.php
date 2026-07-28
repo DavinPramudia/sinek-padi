@@ -10,7 +10,9 @@ class LoketController extends Controller
 {
     public function index()
     {
-        // 1. Ambil data tarif & join dengan tabel kendaraans supaya nama kendaraannya ikut
+        $tanggalHariIni = date('Y-m-d');
+
+        // 1. Ambil data tarif & join dengan kendaraan
         $KategoriKendaraan = DB::table('tarifs')
             ->join('kendaraans', 'tarifs.id_kendaraan', '=', 'kendaraans.id_kendaraan')
             ->select('tarifs.id_tarif', 'tarifs.harga_tarif', 'kendaraans.nama_kendaraan')
@@ -20,38 +22,53 @@ class LoketController extends Controller
 
         // 2. Ringkasan Pendapatan Hari Ini
         $totalPendapatan = DB::table('transaksis')
-            ->whereDate('created_at', today())
+            ->whereDate('waktu', $tanggalHariIni)
             ->sum('total_bayar') ?? 0;
 
-        // 3. Total Tiket Terbit Hari Ini
+        // 3. Total Tiket/Struk Terbit Hari Ini
         $totalTiket = DB::table('transaksis')
-            ->whereDate('created_at', today())
+            ->whereDate('waktu', $tanggalHariIni)
             ->count();
 
-        // 4. Hitung berdasarkan Foreign Key (id_tarif)
+        // 4. Hitung Motor (Fleksibel: mendeteksi 'motor' atau 'Motor')
         $totalMotor = DB::table('transaksis')
-            ->whereDate('created_at', today())
-            ->where('id_tarif', 1) 
+            ->join('tarifs', 'transaksis.id_tarif', '=', 'tarifs.id_tarif')
+            ->join('kendaraans', 'tarifs.id_kendaraan', '=', 'kendaraans.id_kendaraan')
+            ->whereDate('transaksis.waktu', $tanggalHariIni)
+            ->where(function($q) {
+                $q->where('kendaraans.nama_kendaraan', 'LIKE', '%motor%')
+                  ->orWhere('kendaraans.nama_kendaraan', 'LIKE', '%Motor%');
+            })
             ->count();
 
+        // 5. Hitung Mobil (Fleksibel: mendeteksi 'mobil' atau 'Mobil')
         $totalMobil = DB::table('transaksis')
-            ->whereDate('created_at', today())
-            ->where('id_tarif', 2) 
+            ->join('tarifs', 'transaksis.id_tarif', '=', 'tarifs.id_tarif')
+            ->join('kendaraans', 'tarifs.id_kendaraan', '=', 'kendaraans.id_kendaraan')
+            ->whereDate('transaksis.waktu', $tanggalHariIni)
+            ->where(function($q) {
+                $q->where('kendaraans.nama_kendaraan', 'LIKE', '%mobil%')
+                  ->orWhere('kendaraans.nama_kendaraan', 'LIKE', '%Mobil%');
+            })
             ->count();
 
-        // =========================================================
-        // TAMBAHAN BARU: 5. Ambil data Riwayat Transaksi di sini
-        // =========================================================
+        // 6. Total Wisatawan (Jumlah jiwa hari ini dari tabel detail)
+        $totalWisatawan = DB::table('detail_wisatawan_transaksis')
+            ->join('transaksis', 'detail_wisatawan_transaksis.id_transaksi', '=', 'transaksis.id_transaksi')
+            ->whereDate('transaksis.waktu', $tanggalHariIni)
+            ->sum('detail_wisatawan_transaksis.jumlah_jiwa') ?? 0;
+
+        // 7. Ambil data Riwayat Transaksi (5 terakhir hari ini)
         $riwayatTransaksi = DB::table('transaksis')
             ->join('tarifs', 'transaksis.id_tarif', '=', 'tarifs.id_tarif')
             ->join('kendaraans', 'tarifs.id_kendaraan', '=', 'kendaraans.id_kendaraan')
             ->select('transaksis.*', 'kendaraans.nama_kendaraan')
-            ->whereDate('transaksis.created_at', today())
+            ->whereDate('transaksis.waktu', $tanggalHariIni)
             ->orderBy('transaksis.waktu', 'desc')
-            ->limit(5) // Membatasi hanya 5 transaksi terakhir
+            ->limit(5)
             ->get();
 
-        // 6. Kirim semua variabel ke view loket
+        // 8. Kirim semua variabel ke view loket
         return view('petugas.loket', compact(
             'KategoriKendaraan', 
             'KategoriWisatawan', 
@@ -59,7 +76,8 @@ class LoketController extends Controller
             'totalTiket', 
             'totalMotor', 
             'totalMobil',
-            'riwayatTransaksi' // <--- PASTIKAN INI IKUT DITAMBAHKAN
+            'totalWisatawan',
+            'riwayatTransaksi'
         ));
     }
 

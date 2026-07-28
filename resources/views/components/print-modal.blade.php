@@ -13,12 +13,12 @@
                 <button @click="metodePilihan = 'e-ticket'" type="button" 
                         :class="metodePilihan === 'e-ticket' ? 'bg-blue-600 text-white font-bold ring-2 ring-white/30' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'" 
                         class="p-4 border border-gray-600 rounded-xl flex flex-col items-center justify-center transition cursor-pointer">
-                    <span>📱 E-Ticket</span>
+                    <span>E-Ticket</span>
                 </button>
                 <button @click="metodePilihan = 'print'" type="button" 
                         :class="metodePilihan === 'print' ? 'bg-blue-600 text-white font-bold ring-2 ring-white/30' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'" 
                         class="p-4 border border-gray-600 rounded-xl flex flex-col items-center justify-center transition cursor-pointer">
-                    <span>🖨️ Print Fisik</span>
+                    <span>Print Fisik</span>
                 </button>
             </div>
 
@@ -43,31 +43,23 @@
         </div>
 
         {{-- TAHAP 3: SUKSES --}}
-        <div x-show="tahap === 'sukses'" class="space-y-4">
-            <div class="text-green-400 text-5xl mb-2">✔️</div>
-            <h4 class="text-lg font-bold text-white">Transaksi Berhasil!</h4>
+        <div x-show="tahap === 'sukses'" class="space-y-4 text-center pb-2">
+            <div class="text-green-400 text-6xl mb-4">✔️</div>
+            <h4 class="text-xl font-bold text-white mb-2">Transaksi Berhasil!</h4>
+            <p class="text-sm text-gray-300 mb-6">Data telah tersimpan ke database.</p>
             
-            {{-- KONDISI 1: JIKA PILIH PRINT FISIK --}}
-            <div x-show="metodePilihan === 'print'" class="space-y-3">
-                <p class="text-sm text-gray-300">Siapkan kertas di printer kasir.</p>
-                <a :href="urlCetak" target="_blank" @click="resetForm()" class="block w-full px-4 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-lg transition cursor-pointer">
-                    🖨️ Cetak Karcis Sekarang
+            {{-- JIKA PILIH PRINT FISIK --}}
+            <div x-show="metodePilihan === 'print'">
+                <a :href="urlCetak" target="_blank" @click="resetForm()" class="block w-full px-4 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-lg transition cursor-pointer shadow-lg active:scale-95">
+                    Cetak Karcis & Selesai
                 </a>
             </div>
 
-            {{-- KONDISI 2: JIKA PILIH E-TICKET --}}
-            <div x-show="metodePilihan === 'e-ticket'" class="space-y-3">
-                <p class="text-sm text-gray-300">Arahkan pengunjung melihat E-Ticket.</p>
-                <a :href="urlCetak" target="_blank" @click="resetForm()" class="block w-full px-4 py-3 bg-green-600 hover:bg-green-500 text-white font-bold text-sm rounded-lg transition cursor-pointer">
-                    📱 Buka E-Ticket
+            {{-- JIKA PILIH E-TICKET --}}
+            <div x-show="metodePilihan === 'e-ticket'">
+                <a :href="urlCetak" target="_blank" @click="resetForm()" class="block w-full px-4 py-3 bg-green-600 hover:bg-green-500 text-white font-bold text-sm rounded-lg transition cursor-pointer shadow-lg active:scale-95">
+                    Download E-Ticket & Selesai
                 </a>
-            </div>
-            
-            {{-- TOMBOL TUTUP / RESET UNTUK KASIR --}}
-            <div class="pt-4 border-t border-gray-700 mt-2">
-                <button @click="resetForm()" type="button" class="w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition cursor-pointer">
-                    Kembali & Lanjut Antrean Baru
-                </button>
             </div>
         </div>
 
