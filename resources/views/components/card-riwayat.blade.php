@@ -17,7 +17,7 @@
                     <th class="pb-3 pl-2">No Karcis</th>
                     <th class="pb-3">Waktu</th>
                     <th class="pb-3">Kendaraan</th>
-                    <th class="pb-3 text-center">Sensus (L / N / M)</th>
+                    <th class="pb-3 text-center">(L / N / M)</th>
                     <th class="pb-3">Biaya</th>
                     <th class="pb-3 text-center">Aksi</th>
                 </tr>
@@ -36,8 +36,7 @@
                         </td>
                         <td class="py-3.5 text-center">
                             <span class="bg-[#1c2b28] text-[#3aafa9] font-mono px-2.5 py-1 rounded border border-[#3b5952] text-[11px]">
-                                {{-- Ganti ini dengan variabel jika kolom sensus sudah ada di database --}}
-                                - / - / -
+                                {{ $transaksi->sensus_l }} / {{ $transaksi->sensus_n }} / {{ $transaksi->sensus_m }}
                             </span>
                         </td>
                         <td class="py-3.5 font-bold text-[#3aafa9] text-sm">Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }}</td>

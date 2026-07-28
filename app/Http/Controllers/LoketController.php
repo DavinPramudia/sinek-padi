@@ -68,6 +68,36 @@ class LoketController extends Controller
             ->limit(5)
             ->get();
 
+        // Loop untuk mengambil jumlah jiwa (L / N / M) per transaksi
+        foreach ($riwayatTransaksi as $trx) {
+            $details = DB::table('detail_wisatawan_transaksis')
+                ->join('kategori_wisatawans', 'detail_wisatawan_transaksis.id_kategori_wisatawan', '=', 'kategori_wisatawans.id_kategori_wisatawan')
+                ->where('detail_wisatawan_transaksis.id_transaksi', $trx->id_transaksi)
+                ->select('kategori_wisatawans.nama_kategori_wisatawan', 'detail_wisatawan_transaksis.jumlah_jiwa')
+                ->get();
+            
+            $lokal = 0;
+            $nusantara = 0;
+            $mancanegara = 0;
+
+            foreach ($details as $det) {
+                $nama = strtolower($det->nama_kategori_wisatawan);
+
+                if (str_contains($nama, 'lokal')) {
+                    $lokal += $det->jumlah_jiwa;
+                } elseif (str_contains($nama, 'nusantara')) {
+                    $nusantara += $det->jumlah_jiwa;
+                } elseif (str_contains($nama, 'mancanegara') || str_contains($nama, 'asing')) {
+                    $mancanegara += $det->jumlah_jiwa;
+                }
+            }
+
+            // Simpan ke dalam properti objek transaksi
+            $trx->sensus_l = $lokal;
+            $trx->sensus_n = $nusantara;
+            $trx->sensus_m = $mancanegara;
+        }
+
         // 8. Kirim semua variabel ke view loket
         return view('petugas.loket', compact(
             'KategoriKendaraan', 

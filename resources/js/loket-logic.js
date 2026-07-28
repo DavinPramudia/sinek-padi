@@ -89,6 +89,7 @@ document.addEventListener('alpine:init', () => {
             for (let key in this.qty) {
                 this.qty[key] = 0;
             }
+            window.location.reload();
         }
     }));
 });
