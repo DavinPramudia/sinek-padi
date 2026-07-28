@@ -58,10 +58,23 @@
 
     </div>
 
-    {{-- Footer Status --}}
+    {{-- Footer Status dengan Indikator Animasi --}}
     <div class="pt-3 border-t border-[#3b5952] flex justify-between items-center text-xs text-[#d1d5dc]">
-        <span>Status Server: <strong class="text-emerald-400 font-semibold">Online</strong></span>
-        <span>Printer: <strong class="text-[#3aafa9] font-semibold">Terhubung</strong></span>
+        <span class="flex items-center space-x-1.5">
+            <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span>Status Server: <strong class="text-emerald-400 font-semibold">Online</strong></span>
+        </span>
+        
+        <span class="flex items-center space-x-1.5">
+            <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-[#3aafa9]"></span>
+            </span>
+            <span>Printer: <strong class="text-[#3aafa9] font-semibold">Terhubung</strong></span>
+        </span>
     </div>
 
 </div>

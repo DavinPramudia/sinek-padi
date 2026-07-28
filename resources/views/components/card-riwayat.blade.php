@@ -52,7 +52,6 @@
                         </td>
                     </tr>
                 @empty
-                    {{-- Jika belum ada transaksi sama sekali --}}
                     <tr>
                         <td colspan="6" class="py-5 text-center text-[#d1d5dc]">Belum ada transaksi hari ini.</td>
                     </tr>

@@ -20,9 +20,14 @@
 
     {{-- Script agar dialog print browser otomatis muncul saat halaman dibuka --}}
     <script>
-        window.onload = function() {
-            window.print();
+    window.onload = function() {
+        window.print();
+        // Opsional: otomatis tutup tab setelah print dialog ditutup
+        window.onafterprint = function() {
+            window.close();
         }
-    </script>
+    }
+</script>
+    
 </body>
 </html>
