@@ -65,43 +65,64 @@ class LoketController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Buat nomor karcis otomatis yang unik
-        $noKarcis = 'TRX-' . date('Ymd') . '-' . strtoupper(Str::random(5));
+        try {
+            // Mulai kunci database. Kalau ada 1 yang gagal insert, semua dibatalkan!
+            DB::beginTransaction();
 
-        // 2. Simpan ke database sesuai kolom migrasi kamu
-        $transaksiId = DB::table('transaksis')->insertGetId([
-            'no_karcis'     => $noKarcis,
-            'total_bayar'   => $request->total_bayar ?? 0,
-            'waktu'         => now(),
-            'reprint_count' => 0,                    
-            'metode_cetak'  => $request->metode_cetak ?? 'print',
-            'id_users'      => auth()->id(),       
-            'id_tarif'      => $request->id_tarif, 
-            'created_at'    => now(),
-            'updated_at'    => now(),
-        ]);
+            // 1. Buat nomor karcis otomatis yang unik
+            $noKarcis = 'TRX-' . date('Ymd') . '-' . strtoupper(Str::random(5));
 
-        if ($request->has('qty_wisatawan')) {
-            foreach ($request->qty_wisatawan as $idKategoriWisatawan => $jumlah) {
-                // Hanya simpan yang jumlahnya lebih dari 0
-                if ($jumlah > 0) {
-                    DB::table('detail_transaksis')->insert([
-                        'id_transaksi'          => $transaksiId, // ID dari transaksi yang baru saja dibuat di atas
-                        'id_kategori_wisatawan' => $idKategoriWisatawan,
-                        'jumlah_pengunjung'     => $jumlah,
-                        'created_at'            => now(),
-                        'updated_at'            => now(),
-                    ]);
+            // 2. Simpan ke tabel utama (transaksis)
+            $transaksiId = DB::table('transaksis')->insertGetId([
+                'no_karcis'     => $noKarcis,
+                'total_bayar'   => $request->total_bayar ?? 0,
+                'waktu'         => now(),
+                'reprint_count' => 0,                    
+                'metode_cetak'  => $request->metode_cetak ?? 'print',
+                'id_users'      => auth()->id(),       
+                'id_tarif'      => $request->id_tarif, 
+                'created_at'    => now(),
+                'updated_at'    => now(),
+            ]);
+
+            // 3. Simpan ke tabel detail wisatawan
+            if ($request->has('qty_wisatawan')) {
+                foreach ($request->qty_wisatawan as $idKategoriWisatawan => $jumlah) {
+                    // Hanya simpan yang jumlahnya lebih dari 0
+                    if ($jumlah > 0) {
+                        
+                        // PASTIKAN INI SESUAI DENGAN TABEL DATABASEMU
+                        // Saya sesuaikan dengan model yang kamu kirim sebelumnya
+                        DB::table('detail_wisatawan_transaksis')->insert([
+                            'id_transaksi'  => $transaksiId,
+                            'id_kategori_wisatawan'   => $idKategoriWisatawan,
+                            'jumlah_jiwa'   => $jumlah,
+                            'created_at'    => now(),
+                            'updated_at'    => now(),
+                        ]);
+                    }
                 }
             }
-        }
-        // ========================================================
 
-        // 3. Kembalikan respons sukses ke Alpine.js
-        return response()->json([
-            'status'    => 'sukses',
-            'url_print' => route('transaksi.cetak', $transaksiId)
-        ]);
+            // Simpan permanen ke database
+            DB::commit();
+
+            // 4. Kembalikan respons sukses ke Alpine.js
+            return response()->json([
+                'status'    => 'sukses',
+                'url_print' => route('transaksi.cetak', $transaksiId)
+            ]);
+
+        } catch (\Exception $e) {
+            // Jika ada error, batalkan semua insert data tadi
+            DB::rollBack();
+
+            // Kirim pesan error berbentuk JSON agar ditangkap oleh Alpine.js
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function cetak($id)

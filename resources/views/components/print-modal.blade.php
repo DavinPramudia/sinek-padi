@@ -45,17 +45,29 @@
         {{-- TAHAP 3: SUKSES --}}
         <div x-show="tahap === 'sukses'" class="space-y-4">
             <div class="text-green-400 text-5xl mb-2">✔️</div>
-            <p class="text-sm text-gray-300">Transaksi berhasil disimpan.</p>
+            <h4 class="text-lg font-bold text-white">Transaksi Berhasil!</h4>
             
-            {{-- Wadah Tombol Bawah (Persis seperti modal logout) --}}
-            <div class="flex justify-center space-x-3 pt-2">
-                <button @click="resetForm()" type="button" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded-lg transition cursor-pointer">
-                    Tutup
-                </button>
-                
-                <a :href="urlCetak" target="_blank" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded-lg transition cursor-pointer">
-                    🖨️ Cetak Tiket
+            {{-- KONDISI 1: JIKA PILIH PRINT FISIK --}}
+            <div x-show="metodePilihan === 'print'" class="space-y-3">
+                <p class="text-sm text-gray-300">Siapkan kertas di printer kasir.</p>
+                <a :href="urlCetak" target="_blank" @click="resetForm()" class="block w-full px-4 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-lg transition cursor-pointer">
+                    🖨️ Cetak Karcis Sekarang
                 </a>
+            </div>
+
+            {{-- KONDISI 2: JIKA PILIH E-TICKET --}}
+            <div x-show="metodePilihan === 'e-ticket'" class="space-y-3">
+                <p class="text-sm text-gray-300">Arahkan pengunjung melihat E-Ticket.</p>
+                <a :href="urlCetak" target="_blank" @click="resetForm()" class="block w-full px-4 py-3 bg-green-600 hover:bg-green-500 text-white font-bold text-sm rounded-lg transition cursor-pointer">
+                    📱 Buka E-Ticket
+                </a>
+            </div>
+            
+            {{-- TOMBOL TUTUP / RESET UNTUK KASIR --}}
+            <div class="pt-4 border-t border-gray-700 mt-2">
+                <button @click="resetForm()" type="button" class="w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition cursor-pointer">
+                    Kembali & Lanjut Antrean Baru
+                </button>
             </div>
         </div>
 
