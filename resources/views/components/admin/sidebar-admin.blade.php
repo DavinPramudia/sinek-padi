@@ -9,28 +9,28 @@
 
         <!-- Menu Navigasi Sidebar -->
         <nav class="space-y-1.5 text-xs font-medium">
-            
-            <!-- Menu Dashboard -->
+    
+            <!-- Dashboard -->
             <a href="{{ route('admin.dashboard') }}" 
-               class="flex items-center space-x-3 px-4 py-3 rounded-xl transition shadow-sm {{ request()->routeIs('admin.dashboard') ? 'bg-[#2E4540] text-[#3aafa9]' : 'hover:bg-[#243733] text-[#d1d5dc]' }}">
+            class="flex items-center space-x-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.dashboard*') ? 'bg-[#2E4540] text-[#3aafa9]' : 'hover:bg-[#243733] text-[#d1d5dc]' }}">
                 <span>Dashboard</span>
             </a>
 
-            <!-- Menu Laporan Transaksi -->
-            <a href="{{ route('admin.laporan') }}" 
-               class="flex items-center space-x-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.laporan') ? 'bg-[#2E4540] text-[#3aafa9]' : 'hover:bg-[#243733] text-[#d1d5dc]' }}">
+            <!-- Laporan Transaksi -->
+            <a href="{{ route('admin.laporan-transaksi') }}" 
+            class="flex items-center space-x-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.laporan*') ? 'bg-[#2E4540] text-[#3aafa9]' : 'hover:bg-[#243733] text-[#d1d5dc]' }}">
                 <span>Laporan Transaksi</span>
             </a>
 
-            <!-- Menu Manajemen Akun -->
-            <a href="{{ route('admin.akun') }}" 
-               class="flex items-center space-x-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.akun') ? 'bg-[#2E4540] text-[#3aafa9]' : 'hover:bg-[#243733] text-[#d1d5dc]' }}">
+            <!-- Manajemen Akun -->
+            <a href="{{ route('admin.manajemen-akun') }}" 
+            class="flex items-center space-x-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.manajemen-akun*') ? 'bg-[#2E4540] text-[#3aafa9]' : 'hover:bg-[#243733] text-[#d1d5dc]' }}">
                 <span>Manajemen Akun</span>
             </a>
 
-            <!-- Menu Pengaturan -->
+            <!-- Pengaturan -->
             <a href="{{ route('admin.pengaturan') }}" 
-               class="flex items-center space-x-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.pengaturan') ? 'bg-[#2E4540] text-[#3aafa9]' : 'hover:bg-[#243733] text-[#d1d5dc]' }}">
+            class="flex items-center space-x-3 px-4 py-3 rounded-xl transition {{ request()->routeIs('admin.pengaturan*') ? 'bg-[#2E4540] text-[#3aafa9]' : 'hover:bg-[#243733] text-[#d1d5dc]' }}">
                 <span>Pengaturan</span>
             </a>
 
@@ -41,7 +41,7 @@
     <div class="border-t border-[#243733] pt-4 px-2">
         <div class="flex items-center space-x-3 text-xs text-[#d1d5dc]">
             <div class="w-7 h-7 rounded-full bg-[#2E4540] flex items-center justify-center font-bold text-[#3aafa9]">A</div>
-            <span class="font-medium text-white">Admin Profile</span>
+            <span class="font-medium text-[#d1d5dc]">Admin Profile</span>
         </div>
     </div>
 </aside>

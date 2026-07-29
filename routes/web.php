@@ -29,13 +29,16 @@ Route::middleware(['auth'])->group(function () {
     // 4. Route untuk cetak karcis
     Route::get('/transaksi/cetak/{id}', [LoketController::class, 'cetak'])->name('transaksi.cetak');
     
-    Route::get('/admin/laporan', function () { 
-        return "Halaman Laporan Transaksi"; })->name('admin.laporan');
-    
-    Route::get('/admin/akun', function () { 
-        return "Halaman Manajemen Akun"; })->name('admin.akun');
-    
-    Route::get('/admin/pengaturan', function () { 
-        return "Halaman Pengaturan"; })->name('admin.pengaturan');
-    // -------------------------------------------------------------
+    Route::get('/admin/laporan-transaksi', function () {
+        return view('admin.laporan-transaksi');
+    })->name('admin.laporan-transaksi');
+
+    Route::get('/admin/manajemen-akun', function () {
+        return view('admin.manajemen-akun');
+    })->name('admin.manajemen-akun');
+
+    Route::get('/admin/pengaturan', function () {
+        return view('admin.pengaturan');
+    })->name('admin.pengaturan');
+
 });
