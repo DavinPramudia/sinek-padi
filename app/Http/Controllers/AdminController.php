@@ -33,7 +33,7 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'username' => 'required|string|unique:users,username',
-            'password' => 'required|min:6|same:password_confirmation',
+            'password' => 'required|min:8|same:password_confirmation',
             'id_roles' => 'required|integer',
         ]);
 
@@ -71,7 +71,7 @@ class AdminController extends Controller
         
         if ($request->filled('password')) {
             $request->validate([
-                'password' => 'min:6|same:password_confirmation',
+                'password' => 'min:8|same:password_confirmation',
             ]);
             $user->password = Hash::make($request->password);
         }

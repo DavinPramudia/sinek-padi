@@ -34,9 +34,9 @@ class AuthController extends Controller
             
             // Arahkan sesuai id_roles
             if ($user->id_roles == 1) {
-                return redirect()->intended('/admin/dashboard');
+                return redirect('/admin/dashboard');
             } elseif ($user->id_roles == 2) {
-                return redirect()->intended('/petugas/loket');
+                return redirect('/petugas/loket');
             }
 
             // Jika role di luar 1 atau 2, keluarkan lagi
