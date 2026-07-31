@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LoketController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\DashboardController; // <- Tambahkan import DashboardController di sini
 
 Route::get('/', function () {
     return view('welcome');
@@ -21,10 +22,8 @@ Route::middleware(['auth'])->group(function () {
     // 1. Halaman Petugas Loket
     Route::get('/petugas/loket', [LoketController::class, 'index'])->name('petugas.loket');
 
-    // 2. Halaman Admin Dashboard
-    Route::get('/admin/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+    // 2. Halaman Admin Dashboard (Diubah menggunakan DashboardController)
+    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
     // 3. Route untuk menyimpan transaksi
     Route::post('/transaksi/store', [LoketController::class, 'store'])->name('transaksi.store');

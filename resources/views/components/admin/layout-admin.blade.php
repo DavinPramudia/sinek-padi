@@ -5,12 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'Dashboard Admin - Sinek Padi' }}</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    
-    <!-- BARIS INI YANG WAJIB DITAMBAHKAN UNTUK MEMUNCULKAN MODAL (Alpine.js) -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -33,6 +30,9 @@
         </main>
 
     </div>
+
+    <!-- STACK UNTUK MENANGKAP SCRIPT DARI HALAMAN ANAK -->
+    @stack('scripts')
 
 </body>
 </html>
