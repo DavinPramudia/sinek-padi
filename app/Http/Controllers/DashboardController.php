@@ -51,6 +51,18 @@ class DashboardController extends Controller
             ->where('total_bayar', '4000') // Sesuaikan isi kolom di database Anda
             ->count();
 
+        // 4. Data Line Chart Tren Kunjungan Harian Perjam (06:00 s.d 18:00)
+        $trenKunjungan = [];
+
+        for ($jam = 6; $jam <= 21; $jam++) {
+            // Menghitung jumlah transaksi pada jam tertentu di hari ini
+            $jumlah = Transaksi::whereDate('waktu', today())
+                ->whereRaw('HOUR(waktu) = ?', [$jam])
+                ->count(); // Atau gunakan sum() jika menghitung jumlah total wisatawan/kendaraan
+
+            $trenKunjungan[] = $jumlah;
+        }
+
         return view('admin.dashboard', compact(
             'totalPendapatan',
             'totalKendaraan',
@@ -59,7 +71,8 @@ class DashboardController extends Controller
             'wisatawanNusantara',
             'wisatawanMancanegara',
             'kendaraanMotor',
-            'kendaraanMobil'
+            'kendaraanMobil',
+            'trenKunjungan'
         ));
     }
 }

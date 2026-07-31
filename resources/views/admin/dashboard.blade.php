@@ -31,14 +31,14 @@
                     </div>
                 </div>
 
-                <!-- Line Chart Box (Statis) -->
-                <div class="bg-[#141c1a] border border-[#243733] p-6 rounded-xl flex-1 flex flex-col min-h-[320px]">
+                <!-- Line Chart Box -->
+                <div class="bg-[#141c1a] border border-[#243733] p-6 rounded-xl flex-1 flex flex-col min-h-[320px] line-chart-container"
+                    data-tren="{{ json_encode($trenKunjungan ?? []) }}">
+                    
                     <h2 class="text-[#EDEDED] font-semibold text-lg mb-6">Tren Kunjungan Harian Perjam</h2>
-                    <div class="flex-1 relative flex flex-col justify-between py-2 border-b border-l border-[#243733] ml-6 mb-6">
-                        <div class="w-full border-t border-[#243733] absolute top-[50%] left-0"></div>
-                        <div class="absolute -bottom-6 w-full flex justify-between text-[10px] text-[#d1d5dc] px-1">
-                            <span>06:00</span><span>12:00</span><span>18:00</span>
-                        </div>
+                    
+                    <div class="flex-1 relative w-full h-[240px]">
+                        <canvas id="trenChart"></canvas>
                     </div>
                 </div>
 
