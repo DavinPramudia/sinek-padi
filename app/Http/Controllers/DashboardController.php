@@ -7,72 +7,136 @@ use App\Models\Kendaraan;
 use Illuminate\Http\Request;
 use App\Models\Transaksi;
 use App\Models\DetailWisatawanTransaksi;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // 1. Data Statistik Atas (Hari ini)
-        $totalPendapatan = Transaksi::whereDate('waktu', today())->sum('total_bayar');
-        $totalKendaraan = Transaksi::whereDate('waktu', today())->count();
-        $totalWisatawan = DetailWisatawanTransaksi::whereHas('transaksi', function($q) {
-            $q->whereDate('waktu', today());
-        })->count();
+        // Ambil jenis filter yang dipilih (default 'harian')
+        $filterType = $request->input('filter_type', 'harian');
 
-        // 2. Data Donut Chart Wisatawan 
+        // Buat query dasar untuk transaksi
+        $transaksiQuery = Transaksi::query();
+
+        // 1. Logika Penyaringan Berdasarkan Filter di Header
+        if ($filterType == 'harian') {
+            $tanggalPilihan = $request->input('tanggal', date('Y-m-d'));
+            $transaksiQuery->whereDate('waktu', $tanggalPilihan);
+        } 
+        elseif ($filterType == 'bulanan' && $request->filled('bulan')) {
+            $tahunBulan = explode('-', $request->bulan);
+            $transaksiQuery->whereYear('waktu', $tahunBulan[0])
+                           ->whereMonth('waktu', $tahunBulan[1]);
+        } 
+        elseif ($filterType == 'tahunan' && $request->filled('tahun')) {
+            $transaksiQuery->whereYear('waktu', $request->tahun);
+        } 
+        elseif ($filterType == 'triwulanan') {
+            $tahun = $request->input('tahun_triwulan', date('Y'));
+            $triwulan = $request->input('triwulan', 1);
+
+            $bulanMulai = (($triwulan - 1) * 3) + 1;
+            $bulanSelesai = $bulanMulai + 2;
+
+            $transaksiQuery->whereYear('waktu', $tahun)
+                           ->whereMonth('waktu', '>=', $bulanMulai)
+                           ->whereMonth('waktu', '<=', $bulanSelesai);
+        } else {
+            $transaksiQuery->whereDate('waktu', today());
+        }
+
+        // 2. Data Statistik Atas (Mengikuti Filter)
+        $totalPendapatan = (clone $transaksiQuery)->sum('total_bayar');
+        $totalKendaraan = (clone $transaksiQuery)->count();
+
+        // Ambil ID transaksi yang lolos filter untuk menghitung detail wisatawan
+        $transaksiIds = (clone $transaksiQuery)->pluck('id_transaksi');
+        $totalWisatawan = DetailWisatawanTransaksi::whereIn('id_transaksi', $transaksiIds)->count();
+
+        // 3. Data Donut Chart Wisatawan 
         $kategoriLokal = KategoriWisatawan::where('nama_kategori_wisatawan', 'like', '%Lokal%Bangka%')->pluck('id_kategori_wisatawan');
         $kategoriNusantara = KategoriWisatawan::where('nama_kategori_wisatawan', 'like', '%Nusantara%')->pluck('id_kategori_wisatawan');
         $kategoriMancanegara = KategoriWisatawan::where('nama_kategori_wisatawan', 'like', '%Mancanegara%')->pluck('id_kategori_wisatawan');
 
-        $wisatawanLokal = DetailWisatawanTransaksi::whereIn('id_kategori_wisatawan', $kategoriLokal)
-            ->whereHas('transaksi', function($q) {
-                $q->whereDate('waktu', today());
-            })->count();
+        $wisatawanLokal = DetailWisatawanTransaksi::whereIn('id_transaksi', $transaksiIds)
+            ->whereIn('id_kategori_wisatawan', $kategoriLokal)->count();
 
-        $wisatawanNusantara = DetailWisatawanTransaksi::whereIn('id_kategori_wisatawan', $kategoriNusantara)
-            ->whereHas('transaksi', function($q) {
-                $q->whereDate('waktu', today());
-            })->count();
+        $wisatawanNusantara = DetailWisatawanTransaksi::whereIn('id_transaksi', $transaksiIds)
+            ->whereIn('id_kategori_wisatawan', $kategoriNusantara)->count();
 
-        $wisatawanMancanegara = DetailWisatawanTransaksi::whereIn('id_kategori_wisatawan', $kategoriMancanegara)
-            ->whereHas('transaksi', function($q) {
-                $q->whereDate('waktu', today());
-            })->count();
+        $wisatawanMancanegara = DetailWisatawanTransaksi::whereIn('id_transaksi', $transaksiIds)
+            ->whereIn('id_kategori_wisatawan', $kategoriMancanegara)->count();
 
-        // 3. Data Donut Chart Kendaraan 
-        $kategoriMotor = Kendaraan::where('nama_kendaraan', 'like', '%Motor%')->pluck('id_kendaraan');
-        $kategoriMobil = Kendaraan::where('nama_kendaraan', 'like', '%Mobil%')->pluck('id_kendaraan');
+        // 4. Data Donut Chart Kendaraan 
+        $kendaraanMotor = (clone $transaksiQuery)->where('total_bayar', '2000')->count();
+        $kendaraanMobil = (clone $transaksiQuery)->where('total_bayar', '4000')->count();
 
-        $kendaraanMotor = Transaksi::whereDate('waktu', today())
-            ->where('total_bayar', '2000') // Sesuaikan isi kolom di database Anda
-            ->count();
-
-        $kendaraanMobil = Transaksi::whereDate('waktu', today())
-            ->where('total_bayar', '4000') // Sesuaikan isi kolom di database Anda
-            ->count();
-
-        // 4. Data Line Chart Tren Kunjungan Harian Perjam (06:00 s.d 18:00)
+        // 5. Data Line Chart Tren Kunjungan (Dinamis Berdasarkan Filter)
         $trenKunjungan = [];
+        $labelsGrafik = [];
 
-        for ($jam = 6; $jam <= 21; $jam++) {
-            // Menghitung jumlah transaksi pada jam tertentu di hari ini
-            $jumlah = Transaksi::whereDate('waktu', today())
-                ->whereRaw('HOUR(waktu) = ?', [$jam])
-                ->count(); // Atau gunakan sum() jika menghitung jumlah total wisatawan/kendaraan
-
-            $trenKunjungan[] = $jumlah;
+        if ($filterType == 'bulanan' && $request->filled('bulan')) {
+            // Jika Bulanan: Ambil data per hari dalam bulan tersebut
+            $tahunBulan = explode('-', $request->bulan);
+            $jumlahHari = Carbon::create($tahunBulan[0], $tahunBulan[1])->daysInMonth;
+            
+            for ($hari = 1; $hari <= $jumlahHari; $hari++) {
+                $tanggalLengkap = $request->bulan . '-' . str_pad($hari, 2, '0', STR_PAD_LEFT);
+                $jumlah = (clone $transaksiQuery)->whereDate('waktu', $tanggalLengkap)->count();
+                $trenKunjungan[] = $jumlah;
+                $labelsGrafik[] = (string) $hari; // Label: 1, 2, 3, ... 31
+            }
+        } 
+        elseif ($filterType == 'tahunan' && $request->filled('tahun')) {
+            // Jika Tahunan: Ambil data per bulan (Jan - Des)
+            for ($bulan = 1; $bulan <= 12; $bulan++) {
+                $jumlah = (clone $transaksiQuery)->whereYear('waktu', $request->tahun)
+                                                 ->whereMonth('waktu', $bulan)
+                                                 ->count();
+                $trenKunjungan[] = $jumlah;
+                // Nama bulan singkat
+                $labelsGrafik[] = Carbon::create(null, $bulan)->translatedFormat('M'); 
+            }
+        } 
+        else {
+            // Jika Harian / Rentang / Lainnya: Ambil data per jam (06:00 s.d 21:00)
+            for ($jam = 6; $jam <= 21; $jam++) {
+                $jumlah = (clone $transaksiQuery)->whereRaw('HOUR(waktu) = ?', [$jam])->count();
+                $trenKunjungan[] = $jumlah;
+                $labelsGrafik[] = str_pad($jam, 2, '0', STR_PAD_LEFT) . ':00'; // Label: 06:00, 07:00, ...
+            }
         }
 
+        // 6. Label Periode Teks Singkat & Satuan Grafik
+        $labelPeriode = match ($filterType) {
+            'bulanan' => $request->filled('bulan') ? Carbon::createFromFormat('Y-m', $request->bulan)->translatedFormat('F Y') : 'Bulan Ini',
+            'tahunan' => 'Tahun ' . $request->input('tahun', date('Y')),
+            'rentang' => ($request->filled('tanggal_mulai') && $request->filled('tanggal_selesai')) 
+                ? Carbon::parse($request->tanggal_mulai)->translatedFormat('d M Y') . ' s/d ' . Carbon::parse($request->tanggal_selesai)->translatedFormat('d M Y') 
+                : 'Rentang Tanggal',
+            default => Carbon::parse($request->input('tanggal', date('Y-m-d')))->translatedFormat('d M Y'),
+        };
+
+        // Tambahkan ini untuk menentukan satuan waktu chart di controller
+        $satuanWaktu = match ($filterType) {
+            'bulanan' => 'Perhari',
+            'tahunan' => 'Perbulan',
+            default => 'Perjam',
+        };
+
+        // 7. Pengaturan Skala Maksimal & Step Grafik Berdasarkan Filter
+        $chartConfig = match ($filterType) {
+            'bulanan' => ['max' => 300, 'step' => 50],
+            'tahunan' => ['max' => 10000, 'step' => 1000],
+            default => ['max' => 50, 'step' => 10], // Untuk harian / rentang / tanggal
+        };
+
         return view('admin.dashboard', compact(
-            'totalPendapatan',
-            'totalKendaraan',
-            'totalWisatawan',
-            'wisatawanLokal',
-            'wisatawanNusantara',
-            'wisatawanMancanegara',
-            'kendaraanMotor',
-            'kendaraanMobil',
-            'trenKunjungan'
+            'totalPendapatan', 'totalKendaraan', 'totalWisatawan',
+            'wisatawanLokal', 'wisatawanNusantara', 'wisatawanMancanegara',
+            'kendaraanMotor', 'kendaraanMobil', 'trenKunjungan', 'labelsGrafik', 
+            'labelPeriode', 'satuanWaktu', 'chartConfig' // <-- Masukkan ke compact
         ));
     }
 }

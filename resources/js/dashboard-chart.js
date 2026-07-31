@@ -1,3 +1,40 @@
+window.changeFilterInput = function() {
+    const type = document.getElementById('filterType').value;
+    
+    // Ambil semua wrapper filter
+    const wrappers = document.querySelectorAll('.filter-input-wrapper');
+    
+    wrappers.forEach(el => {
+        el.classList.add('hidden');
+        // Nonaktifkan semua input/select di dalam wrapper yang tersembunyi agar tidak ikut terkirim ke URL
+        el.querySelectorAll('input, select').forEach(input => input.disabled = true);
+    });
+
+    // Tampilkan wrapper yang dipilih dan aktifkan kembali input/select di dalamnya
+    let activeWrapper = null;
+    if (type === 'harian') {
+        activeWrapper = document.getElementById('wrapperHarian');
+    } else if (type === 'bulanan') {
+        activeWrapper = document.getElementById('wrapperBulanan');
+    } else if (type === 'tahunan') {
+        activeWrapper = document.getElementById('wrapperTahunan');
+    } else if (type === 'triwulanan') {
+        activeWrapper = document.getElementById('wrapperTriwulanan');
+    }
+
+    if (activeWrapper) {
+        activeWrapper.classList.remove('hidden');
+        activeWrapper.querySelectorAll('input, select').forEach(input => input.disabled = false);
+    }
+};
+
+// Jalankan saat halaman selesai dimuat
+document.addEventListener("DOMContentLoaded", function() {
+    if (document.getElementById('filterType')) {
+        changeFilterInput();
+    }
+});
+
 // 1. Donut Pendataan Wisatawan Harian
 document.addEventListener('DOMContentLoaded', function () {
     const canvasEl = document.getElementById('donutWisatawanChart');
@@ -7,7 +44,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const nusantara = parseInt(container.dataset.nusantara) || 0;
         const mancanegara = parseInt(container.dataset.mancanegara) || 0;
 
-        const dataValues = (lokal === 0 && nusantara === 0 && mancanegara === 0) ? [1, 1, 1] : [lokal, nusantara, mancanegara];
+        // Jika semuanya 0, set ke [0, 0, 0] agar kosong bersih
+        const dataValues = (lokal === 0 && nusantara === 0 && mancanegara === 0) ? [0, 0, 0] : [lokal, nusantara, mancanegara];
+        const backgroundColors = (lokal === 0 && nusantara === 0 && mancanegara === 0) ? ['#243733', '#243733', '#243733'] : ['#3aafa9', '#E17055', '#EDEDED'];
 
         new window.Chart(canvasEl.getContext('2d'), {
             type: 'doughnut',
@@ -15,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 labels: ['Lokal', 'Nusantara', 'Mancanegara'],
                 datasets: [{
                     data: dataValues,
-                    backgroundColor: ['#3aafa9', '#E17055', '#EDEDED'],
+                    backgroundColor: backgroundColors,
                     borderWidth: 0
                 }]
             },
@@ -37,7 +76,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const motor = parseInt(container.dataset.motor) || 0;
         const mobil = parseInt(container.dataset.mobil) || 0;
 
-        const dataValues = (motor === 0 && mobil === 0) ? [1, 1] : [motor , mobil];
+        // Jika keduanya 0, set ke [0, 0] agar kosong bersih
+        const dataValues = (motor === 0 && mobil === 0) ? [0, 0] : [motor, mobil];
+        const backgroundColors = (motor === 0 && mobil === 0) ? ['#243733', '#243733'] : ['#3aafa9', '#E17055'];
 
         new window.Chart(canvasEl.getContext('2d'), {
             type: 'doughnut',
@@ -45,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 labels: ['Motor', 'Mobil'],
                 datasets: [{
                     data: dataValues,
-                    backgroundColor: ['#3aafa9', '#E17055'],
+                    backgroundColor: backgroundColors,
                     borderWidth: 0
                 }]
             },
@@ -60,47 +101,55 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // 3. Line Chart: Tren Kunjungan Harian Perjam
-document.addEventListener('DOMContentLoaded', function () {
-    const lineEl = document.getElementById('trenChart');
-    if (lineEl) {
-        const container = lineEl.closest('.line-chart-container');
-        const trenData = JSON.parse(container.dataset.tren || '[]');
+document.addEventListener("DOMContentLoaded", function() {
+    const container = document.querySelector('.line-chart-container');
+    if (container) {
+        const trenData = JSON.parse(container.getAttribute('data-tren') || '[]');
+        const labelsData = JSON.parse(container.getAttribute('data-labels') || '[]');
+        
+        // Ambil nilai max dan step dari atribut HTML
+        const maxVal = parseInt(container.getAttribute('data-max')) || 20;
+        const stepVal = parseInt(container.getAttribute('data-step')) || 5;
 
-        // Jika data kosong semua, kita beri data dummy [0,0,0...] atau angka tes agar line chart terbentuk rapi
-        const chartData = trenData.length > 0 ? trenData : [0, 0, 5, 12, 25, 30, 20, 15, 10, 5, 2, 0, 0];
+        const ctx = document.getElementById('trenChart').getContext('2d');
+        
+        if (window.myLineChart) {
+            window.myLineChart.destroy();
+        }
 
-        new window.Chart(lineEl.getContext('2d'), {
+        window.myLineChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00','20:00','21:00'],
+                labels: labelsData,
                 datasets: [{
                     label: 'Kunjungan',
-                    data: chartData,
+                    data: trenData,
                     borderColor: '#3aafa9',
                     backgroundColor: 'rgba(58, 175, 169, 0.1)',
                     borderWidth: 2,
                     fill: true,
-                    tension: 0.4 // Membuat garisnya melengkung halus (smooth)
+                    tension: 0.3
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+                plugins: {
+                    legend: { display: false }
+                },
                 scales: {
-                    x: { 
-                        grid: { color: '#243733' }, 
-                        ticks: { color: '#d1d5dc', font: { size: 10 } } 
+                    x: {
+                        grid: { color: '#243733' },
+                        ticks: { color: '#d1d5dc' }
                     },
-                    y: { 
-                        grid: { color: '#243733' }, 
+                    y: {
+                        grid: { color: '#243733' },
                         ticks: { 
                             color: '#d1d5dc', 
-                            font: { size: 10 },
-                            stepSize: 5 
+                            stepSize: stepVal // <-- Mengatur kelipatan angka di sumbu Y
                         },
-                        beginAtZero: true,
-                        suggestedMax: 20
+                        suggestedMax: maxVal, // <-- Mengatur batas minimal nilai maksimal grafik
+                        beginAtZero: true
                     }
                 }
             }
