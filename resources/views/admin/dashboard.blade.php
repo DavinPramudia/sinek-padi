@@ -22,46 +22,58 @@
                     </select>
                 </div>
 
-                <!-- 1. Input Harian (Tanggal dengan Kalender) -->
+                <!-- 1. Input Harian -->
                 <div id="wrapperHarian" class="filter-input-wrapper relative flex items-center">
-                    <span onclick="document.getElementById('inputTanggalHarian').showPicker()" class="absolute left-2.5 text-[#d1d5dc] cursor-pointer flex items-center hover:text-white transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
-                        </svg>
+                    <span onclick="document.getElementById('inputHarian').showPicker()" class="absolute left-2.5 text-[#d1d5dc] cursor-pointer flex items-center hover:text-white transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" /></svg>
                     </span>
-                    <input type="date" id="inputTanggalHarian" name="tanggal" value="{{ request('tanggal', date('Y-m-d')) }}" class="bg-[#0B0909] border border-[#243733] text-[#EDEDED] text-xs rounded-lg pl-8 pr-2.5 py-1.5 focus:outline-none">
+                    <input type="date" id="inputHarian" name="tanggal" value="{{ request('tanggal', date('Y-m-d')) }}" class="bg-[#0B0909] border border-[#243733] text-[#EDEDED] text-xs rounded-lg pl-8 pr-2.5 py-1.5 focus:outline-none w-36">
                 </div>
 
-                <!-- 2. Input Bulanan (Bulan & Tahun) -->
-                <div id="wrapperBulanan" class="filter-input-wrapper hidden">
-                    <input type="month" name="bulan" value="{{ request('bulan', date('Y-m')) }}" class="bg-[#0B0909] border border-[#243733] text-[#EDEDED] text-xs rounded-lg px-2.5 py-1.5 focus:outline-none">
+                <!-- 2. Input Bulanan -->
+                <div id="wrapperBulanan" class="filter-input-wrapper relative flex items-center hidden">
+                    <span onclick="document.getElementById('inputBulanan').showPicker()" class="absolute left-2.5 text-[#d1d5dc] cursor-pointer flex items-center hover:text-white transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" /></svg>
+                    </span>
+                    <input type="month" id="inputBulanan" name="bulan" value="{{ request('bulan', date('Y-m')) }}" class="bg-[#0B0909] border border-[#243733] text-[#EDEDED] text-xs rounded-lg pl-8 pr-2.5 py-1.5 focus:outline-none w-36">
                 </div>
 
-                <!-- 3. Input Tahunan (Tahun Saja) -->
-                <div id="wrapperTahunan" class="filter-input-wrapper hidden">
-                    <select name="tahun" class="bg-[#0B0909] border border-[#243733] text-[#EDEDED] text-xs rounded-lg px-2.5 py-1.5 focus:outline-none">
-                        @for($y = date('Y'); $y >= 2024; $y--)
-                            <option value="{{ $y }}" {{ request('tahun', date('Y')) == $y ? 'selected' : '' }} class="bg-[#0B0909]">{{ $y }}</option>
-                        @endfor
-                    </select>
+                <!-- 3. Input Tahunan -->
+                <div id="wrapperTahunan" class="filter-input-wrapper relative flex items-center hidden">
+                    <span class="absolute left-2.5 text-[#d1d5dc] pointer-events-none flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" /></svg>
+                    </span>
+                    <input type="text" name="tahun" maxlength="4" placeholder="YYYY" value="{{ request('tahun', date('Y')) }}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="bg-[#0B0909] border border-[#243733] text-[#EDEDED] text-xs rounded-lg pl-8 pr-2.5 py-1.5 focus:outline-none w-36">
                 </div>
 
-                <!-- 4. Input Triwulanan (Tribulan & Tahun) -->
-                <div id="wrapperTriwulanan" class="filter-input-wrapper hidden flex items-center gap-1">
-                    <select name="triwulan" class="bg-[#0B0909] border border-[#243733] text-[#EDEDED] text-xs rounded-lg px-2.5 py-1.5 focus:outline-none">
-                        <option value="1" {{ request('triwulan') == '1' ? 'selected' : '' }} class="bg-[#0B0909]">Tribulan 1</option>
-                        <option value="2" {{ request('triwulan') == '2' ? 'selected' : '' }} class="bg-[#0B0909]">Tribulan 2</option>
-                        <option value="3" {{ request('triwulan') == '3' ? 'selected' : '' }} class="bg-[#0B0909]">Tribulan 3</option>
-                        <option value="4" {{ request('triwulan') == '4' ? 'selected' : '' }} class="bg-[#0B0909]">Tribulan 4</option>
-                    </select>
-                    <select name="tahun_triwulan" class="bg-[#0B0909] border border-[#243733] text-[#EDEDED] text-xs rounded-lg px-2.5 py-1.5 focus:outline-none">
-                        @for($y = date('Y'); $y >= 2024; $y--)
-                            <option value="{{ $y }}" {{ request('tahun_triwulan', date('Y')) == $y ? 'selected' : '' }} class="bg-[#0B0909]">{{ $y }}</option>
-                        @endfor
-                    </select>
+                <!-- 4. Input Triwulanan -->
+                <div id="wrapperTriwulanan" class="filter-input-wrapper relative flex items-center hidden gap-1">
+                    <!-- Pilih Tribulan -->
+                    <div class="relative flex items-center">
+                        <span class="absolute left-2.5 text-[#d1d5dc] flex items-center pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" /></svg>
+                        </span>
+                        <select name="triwulan" class="bg-[#0B0909] border border-[#243733] text-[#EDEDED] text-xs rounded-lg pl-8 pr-2.5 py-1.5 focus:outline-none cursor-pointer appearance-none">
+                            <option value="1" {{ request('triwulan') == '1' ? 'selected' : '' }} class="bg-[#0B0909]">Tribulan 1</option>
+                            <option value="2" {{ request('triwulan') == '2' ? 'selected' : '' }} class="bg-[#0B0909]">Tribulan 2</option>
+                            <option value="3" {{ request('triwulan') == '3' ? 'selected' : '' }} class="bg-[#0B0909]">Tribulan 3</option>
+                            <option value="4" {{ request('triwulan') == '4' ? 'selected' : '' }} class="bg-[#0B0909]">Tribulan 4</option>
+                        </select>
+                    </div>
+                    <!-- Pilih Tahun Triwulanan dengan Ikon Kalender -->
+                    <div class="relative flex items-center">
+                        <span class="absolute left-2.5 text-[#d1d5dc] flex items-center pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" /></svg>
+                        </span>
+                        <select name="tahun_triwulan" class="bg-[#0B0909] border border-[#243733] text-[#EDEDED] text-xs rounded-lg pl-8 pr-2.5 py-1.5 focus:outline-none cursor-pointer">
+                            @for($y = date('Y'); $y >= 2024; $y--)
+                                <option value="{{ $y }}" {{ request('tahun_triwulan', date('Y')) == $y ? 'selected' : '' }} class="bg-[#0B0909]">{{ $y }}</option>
+                            @endfor
+                        </select>
+                    </div>
                 </div>
 
-                <!-- Tombol Submit Filter -->
+                <!-- Tombol Submit -->
                 <button type="submit" class="bg-[#3aafa9] hover:bg-[#2b8a85] text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition">
                     Filter
                 </button>
@@ -91,7 +103,7 @@
                 </div>
 
                 <!-- Line Chart Box -->
-                <div class="bg-[#141c1a] border border-[#243733] p-6 rounded-xl flex-1 flex flex-col min-h-[320px] line-chart-container"
+                <div class="bg-[#141c1a] border border-[#243733] p-6 rounded-xl flex-1 flex flex-col min-h-[320] line-chart-container"
                     data-tren="{{ json_encode($trenKunjungan ?? []) }}"
                     data-labels="{{ json_encode($labelsGrafik ?? []) }}"
                     data-max="{{ $chartConfig['max'] }}"
@@ -101,7 +113,7 @@
                         Tren Kunjungan {{ $labelPeriode }} {{ $satuanWaktu }}
                     </h2>
                     
-                    <div class="flex-1 relative w-full h-[240px]">
+                    <div class="flex-1 relative w-full h-[240]">
                         <canvas id="trenChart"></canvas>
                     </div>
                 </div>
@@ -112,7 +124,7 @@
             <div class="col-span-1 flex flex-col space-y-6">
                 
                 <!-- 1. Chart Sensus Wisatawan -->
-                <div class="bg-[#141c1a] border border-[#243733] p-6 rounded-xl flex-1 flex flex-col min-h-[250px] donut-wisatawan-container"
+                <div class="bg-[#141c1a] border border-[#243733] p-6 rounded-xl flex-1 flex flex-col min-h-[250] donut-wisatawan-container"
                     data-lokal="{{ $wisatawanLokal ?? 0 }}"
                     data-nusantara="{{ $wisatawanNusantara ?? 0 }}"
                     data-mancanegara="{{ $wisatawanMancanegara ?? 0 }}">
@@ -132,7 +144,7 @@
                 </div>
 
                 <!-- 2. Chart Kendaraan -->
-                <div class="bg-[#141c1a] border border-[#243733] p-6 rounded-xl flex-1 flex flex-col min-h-[250px] donut-kategori-kendaraan-container"
+                <div class="bg-[#141c1a] border border-[#243733] p-6 rounded-xl flex-1 flex flex-col min-h-[250] donut-kategori-kendaraan-container"
                     data-motor="{{ $kendaraanMotor ?? 0 }}"
                     data-mobil="{{ $kendaraanMobil ?? 0 }}">
 

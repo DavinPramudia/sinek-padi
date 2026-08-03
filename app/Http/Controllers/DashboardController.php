@@ -95,16 +95,31 @@ class DashboardController extends Controller
                                                  ->whereMonth('waktu', $bulan)
                                                  ->count();
                 $trenKunjungan[] = $jumlah;
-                // Nama bulan singkat
-                $labelsGrafik[] = Carbon::create(null, $bulan)->translatedFormat('M'); 
+                $labelsGrafik[] = Carbon::create(null, $bulan)->translatedFormat('M'); // Jan, Feb...
             }
         } 
+        elseif ($filterType == 'triwulanan') {
+            // Jika Triwulanan: Ambil data per 3 bulan dalam triwulan tersebut
+            $tahun = $request->input('tahun_triwulan', date('Y'));
+            $triwulan = $request->input('triwulan', 1);
+
+            $bulanMulai = (($triwulan - 1) * 3) + 1;
+            $bulanSelesai = $bulanMulai + 2;
+
+            for ($bulan = $bulanMulai; $bulan <= $bulanSelesai; $bulan++) {
+                $jumlah = (clone $transaksiQuery)->whereYear('waktu', $tahun)
+                                                 ->whereMonth('waktu', $bulan)
+                                                 ->count();
+                $trenKunjungan[] = $jumlah;
+                $labelsGrafik[] = Carbon::create(null, $bulan)->translatedFormat('M'); // Misal: Jan, Feb, Mar
+            }
+        }
         else {
             // Jika Harian / Rentang / Lainnya: Ambil data per jam (06:00 s.d 21:00)
             for ($jam = 6; $jam <= 21; $jam++) {
                 $jumlah = (clone $transaksiQuery)->whereRaw('HOUR(waktu) = ?', [$jam])->count();
                 $trenKunjungan[] = $jumlah;
-                $labelsGrafik[] = str_pad($jam, 2, '0', STR_PAD_LEFT) . ':00'; // Label: 06:00, 07:00, ...
+                $labelsGrafik[] = str_pad($jam, 2, '0', STR_PAD_LEFT) . ':00'; // Label: 06:00, 07:00...
             }
         }
 
@@ -112,16 +127,28 @@ class DashboardController extends Controller
         $labelPeriode = match ($filterType) {
             'bulanan' => $request->filled('bulan') ? Carbon::createFromFormat('Y-m', $request->bulan)->translatedFormat('F Y') : 'Bulan Ini',
             'tahunan' => 'Tahun ' . $request->input('tahun', date('Y')),
+            'triwulanan' => (function() use ($request) {
+                $t = $request->input('triwulan', 1);
+                $thn = $request->input('tahun_triwulan', date('Y'));
+                $namaBulan = match ((int)$t) {
+                    1 => 'Januari - Maret',
+                    2 => 'April - Juni',
+                    3 => 'Juli - September',
+                    4 => 'Oktober - Desember',
+                    default => ''
+                };
+                return "Tribulan {$t} ({$namaBulan}) {$thn}";
+            })(),
             'rentang' => ($request->filled('tanggal_mulai') && $request->filled('tanggal_selesai')) 
                 ? Carbon::parse($request->tanggal_mulai)->translatedFormat('d M Y') . ' s/d ' . Carbon::parse($request->tanggal_selesai)->translatedFormat('d M Y') 
                 : 'Rentang Tanggal',
             default => Carbon::parse($request->input('tanggal', date('Y-m-d')))->translatedFormat('d M Y'),
         };
 
-        // Tambahkan ini untuk menentukan satuan waktu chart di controller
+        // Satuan waktu untuk judul grafik
         $satuanWaktu = match ($filterType) {
             'bulanan' => 'Perhari',
-            'tahunan' => 'Perbulan',
+            'tahunan', 'triwulanan' => 'Perbulan', // Triwulanan kini menggunakan satuan per bulan
             default => 'Perjam',
         };
 
@@ -129,6 +156,7 @@ class DashboardController extends Controller
         $chartConfig = match ($filterType) {
             'bulanan' => ['max' => 300, 'step' => 50],
             'tahunan' => ['max' => 10000, 'step' => 1000],
+            'triwulanan' => ['max' => 3000, 'step' => 500], // Sesuaikan skala untuk triwulanan (3 bulan)
             default => ['max' => 50, 'step' => 10], // Untuk harian / rentang / tanggal
         };
 

@@ -6,6 +6,8 @@
     <title>Login Petugas - Sinek Padi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="bg-[#0B0909] text-[#ededed] font-sans antialiased h-full flex items-center justify-center p-4">
 
