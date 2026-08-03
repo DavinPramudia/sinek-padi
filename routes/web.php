@@ -4,7 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LoketController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\DashboardController; // <- Tambahkan import DashboardController di sini
+use App\Http\Controllers\DashboardController; 
+use App\Http\Controllers\LaporanController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -32,9 +33,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/transaksi/cetak/{id}', [LoketController::class, 'cetak'])->name('transaksi.cetak');
     
     // 5. Halaman Laporan Transaksi Admin
-    Route::get('/admin/laporan-transaksi', function () {
-        return view('admin.laporan-transaksi');
-    })->name('admin.laporan-transaksi');
+    Route::get('/admin/laporan-transaksi', [LaporanController::class, 'index'])->name('admin.laporan-transaksi');
 
     // 6. Halaman Manajemen Akun (DIHUBUNGKAN KE AdminController)
     Route::get('/admin/manajemen-akun', [AdminController::class, 'manajemenAkun'])->name('admin.manajemen-akun');
