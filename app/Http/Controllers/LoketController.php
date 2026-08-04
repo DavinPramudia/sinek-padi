@@ -20,6 +20,18 @@ class LoketController extends Controller
 
         $KategoriWisatawan = DB::table('kategori_wisatawans')->get(); 
 
+        // --- PINDAHAN LOGIKA MAPPING KE CONTROLLER ---
+        $tarifMap = [];
+        foreach($KategoriKendaraan as $k) {
+            $tarifMap[$k->id_tarif] = $k->harga_tarif;
+        }
+
+        $qtyMap = [];
+        foreach($KategoriWisatawan as $w) {
+            $qtyMap[$w->id_kategori_wisatawan] = 0;
+        }
+        // ---------------------------------------------
+
         // 2. Ringkasan Pendapatan Hari Ini
         $totalPendapatan = DB::table('transaksis')
             ->whereDate('waktu', $tanggalHariIni)
@@ -30,7 +42,7 @@ class LoketController extends Controller
             ->whereDate('waktu', $tanggalHariIni)
             ->count();
 
-        // 4. Hitung Motor (Fleksibel: mendeteksi 'motor' atau 'Motor')
+        // 4. Hitung Motor
         $totalMotor = DB::table('transaksis')
             ->join('tarifs', 'transaksis.id_tarif', '=', 'tarifs.id_tarif')
             ->join('kendaraans', 'tarifs.id_kendaraan', '=', 'kendaraans.id_kendaraan')
@@ -41,7 +53,7 @@ class LoketController extends Controller
             })
             ->count();
 
-        // 5. Hitung Mobil (Fleksibel: mendeteksi 'mobil' atau 'Mobil')
+        // 5. Hitung Mobil
         $totalMobil = DB::table('transaksis')
             ->join('tarifs', 'transaksis.id_tarif', '=', 'tarifs.id_tarif')
             ->join('kendaraans', 'tarifs.id_kendaraan', '=', 'kendaraans.id_kendaraan')
@@ -52,7 +64,7 @@ class LoketController extends Controller
             })
             ->count();
 
-        // 6. Total Wisatawan (Jumlah jiwa hari ini dari tabel detail)
+        // 6. Total Wisatawan
         $totalWisatawan = DB::table('detail_wisatawan_transaksis')
             ->join('transaksis', 'detail_wisatawan_transaksis.id_transaksi', '=', 'transaksis.id_transaksi')
             ->whereDate('transaksis.waktu', $tanggalHariIni)
@@ -68,7 +80,6 @@ class LoketController extends Controller
             ->limit(5)
             ->get();
 
-        // Loop untuk mengambil jumlah jiwa (L / N / M) per transaksi
         foreach ($riwayatTransaksi as $trx) {
             $details = DB::table('detail_wisatawan_transaksis')
                 ->join('kategori_wisatawans', 'detail_wisatawan_transaksis.id_kategori_wisatawan', '=', 'kategori_wisatawans.id_kategori_wisatawan')
@@ -92,16 +103,17 @@ class LoketController extends Controller
                 }
             }
 
-            // Simpan ke dalam properti objek transaksi
             $trx->sensus_l = $lokal;
             $trx->sensus_n = $nusantara;
             $trx->sensus_m = $mancanegara;
         }
 
-        // 8. Kirim semua variabel ke view loket
+        // 8. Kirim variabel lengkap ke view (termasuk tarifMap dan qtyMap)
         return view('petugas.loket', compact(
             'KategoriKendaraan', 
             'KategoriWisatawan', 
+            'tarifMap',
+            'qtyMap',
             'totalPendapatan', 
             'totalTiket', 
             'totalMotor', 
@@ -114,13 +126,10 @@ class LoketController extends Controller
     public function store(Request $request)
     {
         try {
-            // Mulai kunci database. Kalau ada 1 yang gagal insert, semua dibatalkan!
             DB::beginTransaction();
 
-            // 1. Buat nomor karcis otomatis yang unik
             $noKarcis = 'TRX-' . date('Ymd') . '-' . strtoupper(Str::random(5));
 
-            // 2. Simpan ke tabel utama (transaksis)
             $transaksiId = DB::table('transaksis')->insertGetId([
                 'no_karcis'     => $noKarcis,
                 'total_bayar'   => $request->total_bayar ?? 0,
@@ -133,39 +142,30 @@ class LoketController extends Controller
                 'updated_at'    => now(),
             ]);
 
-            // 3. Simpan ke tabel detail wisatawan
             if ($request->has('qty_wisatawan')) {
                 foreach ($request->qty_wisatawan as $idKategoriWisatawan => $jumlah) {
-                    // Hanya simpan yang jumlahnya lebih dari 0
                     if ($jumlah > 0) {
-                        
-                        // PASTIKAN INI SESUAI DENGAN TABEL DATABASEMU
-                        // Saya sesuaikan dengan model yang kamu kirim sebelumnya
                         DB::table('detail_wisatawan_transaksis')->insert([
-                            'id_transaksi'  => $transaksiId,
-                            'id_kategori_wisatawan'   => $idKategoriWisatawan,
-                            'jumlah_jiwa'   => $jumlah,
-                            'created_at'    => now(),
-                            'updated_at'    => now(),
+                            'id_transaksi'          => $transaksiId,
+                            'id_kategori_wisatawan' => $idKategoriWisatawan,
+                            'jumlah_jiwa'           => $jumlah,
+                            'created_at'            => now(),
+                            'updated_at'            => now(),
                         ]);
                     }
                 }
             }
 
-            // Simpan permanen ke database
             DB::commit();
 
-            // 4. Kembalikan respons sukses ke Alpine.js
             return response()->json([
                 'status'    => 'sukses',
                 'url_print' => route('transaksi.cetak', $transaksiId)
             ]);
 
         } catch (\Exception $e) {
-            // Jika ada error, batalkan semua insert data tadi
             DB::rollBack();
 
-            // Kirim pesan error berbentuk JSON agar ditangkap oleh Alpine.js
             return response()->json([
                 'status'  => 'error',
                 'message' => $e->getMessage()

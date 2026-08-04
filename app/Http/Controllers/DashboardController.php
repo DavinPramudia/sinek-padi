@@ -69,8 +69,8 @@ class DashboardController extends Controller
             ->whereIn('id_kategori_wisatawan', $kategoriMancanegara)->count();
 
         // 4. Data Donut Chart Kendaraan 
-        $kendaraanMotor = (clone $transaksiQuery)->where('total_bayar', '2000')->count();
-        $kendaraanMobil = (clone $transaksiQuery)->where('total_bayar', '4000')->count();
+        $kendaraanMotor = (clone $transaksiQuery)->where('id_tarif', 1)->count(); 
+        $kendaraanMobil = (clone $transaksiQuery)->where('id_tarif', 2)->count();
 
         // 5. Data Line Chart Tren Kunjungan (Dinamis Berdasarkan Filter)
         $trenKunjungan = [];

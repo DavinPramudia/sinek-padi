@@ -1,18 +1,5 @@
-@props(['kategoriKendaraan', 'kategoriWisatawan'])
+@props(['kategoriKendaraan', 'kategoriWisatawan', 'tarifMap', 'qtyMap'])
 
-@php
-    $tarifMap = [];
-    foreach($kategoriKendaraan as $k) {
-        $tarifMap[$k->id_tarif] = $k->harga_tarif;
-    }
-
-    $qtyMap = [];
-    foreach($kategoriWisatawan as $w) {
-        $qtyMap[$w->id_kategori_wisatawan] = 0;
-    }
-@endphp
-
-{{-- Tambahkan parameter ke-3: URL route untuk proses simpan data --}}
 <div x-data="loketTransaksi({{ json_encode($tarifMap) }}, {{ json_encode($qtyMap) }}, '{{ route('transaksi.store') }}')" class="bg-[#2E4540] rounded-3xl p-5 shadow-lg flex flex-col justify-between space-y-6 h-full border border-[#3b5952]">
     
     <div class="space-y-6">

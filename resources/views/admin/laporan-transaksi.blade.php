@@ -24,10 +24,13 @@
                 <input type="hidden" name="triwulan" value="{{ request('triwulan') }}">
                 <input type="hidden" name="tahun_triwulan" value="{{ request('tahun_triwulan') }}">
 
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-[#d1d5dc]">
+                <!-- Ikon Search dipindah ke Kanan (right-0 pr-3) -->
+                <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[#d1d5dc]">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
                 </span>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari No. Tiket..." class="w-full bg-[#141c1a] border border-[#243733] text-[#EDEDED] text-xs rounded-xl pl-9 pr-4 py-2 focus:outline-none">
+
+                <!-- Padding input disesuaikan: pl-4 di kiri, pr-9 di kanan agar teks tidak menabrak ikon -->
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari No. Tiket..." class="w-full bg-[#141c1a] border border-[#243733] text-[#EDEDED] text-xs rounded-xl pl-4 pr-9 py-2 focus:outline-none">
             </form>
 
             <a href="#" class="bg-[#141c1a] border border-[#243733] text-[#EDEDED] hover:bg-[#243733] text-xs font-semibold px-4 py-2 rounded-xl transition flex items-center space-x-2">

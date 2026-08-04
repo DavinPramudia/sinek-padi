@@ -5,6 +5,8 @@
         <x-card-kategori 
             :kategoriKendaraan="$KategoriKendaraan"
             :kategori-wisatawan="$KategoriWisatawan" 
+            :tarifMap="$tarifMap"
+            :qtyMap="$qtyMap"
         />
 
         <x-card-ringkasan 
