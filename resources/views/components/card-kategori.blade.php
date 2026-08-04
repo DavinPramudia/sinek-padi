@@ -16,7 +16,7 @@
                 @foreach ($kategoriKendaraan as $item)
                     <button type="button"
                             @click="kategoriKendaraan = '{{ $item->id_tarif }}'"
-                            :class="kategoriKendaraan === '{{ $item->id_tarif }}' ? '!bg-[#3aafa9] ring-4 ring-amber-400 font-bold' : 'bg-[#408175]'"
+                            :class="kategoriKendaraan === '{{ $item->id_tarif }}' ? 'bg-[#3aafa9] ring-4 ring-amber-400 font-bold' : 'bg-[#408175]'"
                             class="hover:bg-[#3aafa9] text-[#d1d5dc] rounded-xl p-5 flex flex-col items-center justify-center text-center w-full transition duration-150 shadow-md active:scale-95 border border-[#3b5952]">
                         <span class="text-base font-bold text-[#d1d5dc]">{{ $item->nama_kendaraan }}</span>
                         <span class="text-xs text-[#d1d5dc] mt-1">Rp {{ number_format($item->harga_tarif, 0, ',', '.') }}</span>

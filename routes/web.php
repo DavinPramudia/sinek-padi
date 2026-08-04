@@ -6,6 +6,7 @@ use App\Http\Controllers\LoketController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DashboardController; 
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\PengaturanController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -50,8 +51,6 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/admin/manajemen-akun/delete/{id}', [AdminController::class, 'destroy'])->name('admin.manajemen-akun.destroy');
 
     // 7. Halaman Pengaturan Admin
-    Route::get('/admin/pengaturan', function () {
-        return view('admin.pengaturan');
-    })->name('admin.pengaturan');
-
+    Route::get('/admin/pengaturan', [PengaturanController::class, 'index'])->name('admin.pengaturan');
+    Route::put('/admin/pengaturan/{id}', [PengaturanController::class, 'update'])->name('admin.pengaturan.update');
 });
