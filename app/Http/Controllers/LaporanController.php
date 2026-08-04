@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\KategoriWisatawan;
+use App\Models\Kendaraan;
 use Illuminate\Http\Request;
 use App\Models\Transaksi;
+use App\Models\DetailWisatawanTransaksi;
 use Carbon\Carbon;
 
 class LaporanController extends Controller
@@ -14,10 +17,10 @@ class LaporanController extends Controller
         $filterType = $request->input('filter_type', 'harian');
         $search = $request->input('search');
 
-        // 2. Buat query dasar untuk transaksi (Sama persis seperti Dashboard)
-        $transaksiQuery = Transaksi::with(['detailWisatawan.kategoriWisatawan', 'petugas']);
+        // 2. Buat query dasar untuk transaksi
+        $transaksiQuery = Transaksi::with(['details.kategoriWisatawan', 'user']);
 
-        // 3. Logika Penyaringan Berdasarkan Filter di Header (Copy-paste dari Dashboard)
+        // 3. Logika Penyaringan Berdasarkan Filter di Header (Menyesuaikan dengan Dashboard)
         if ($filterType == 'harian') {
             $tanggalPilihan = $request->input('tanggal', date('Y-m-d'));
             $transaksiQuery->whereDate('waktu', $tanggalPilihan);
@@ -44,17 +47,40 @@ class LaporanController extends Controller
             $transaksiQuery->whereDate('waktu', today());
         }
 
-        // 4. Tambahan Fitur Pencarian No Tiket
+        // 4. Tambahan Fitur Pencarian No Karcis / No Tiket
         if ($search) {
-            $transaksiQuery->where('no_tiket', 'like', "%{$search}%");
+            $transaksiQuery->where('no_karcis', 'like', "%{$search}%");
         }
 
         // 5. Data Statistik Kartu Atas (Mengikuti Filter)
         $totalTransaksi = (clone $transaksiQuery)->count();
         $totalPendapatan = (clone $transaksiQuery)->sum('total_bayar');
 
-        // 6. Ambil Data untuk Tabel dengan Pagination (Menggantikan get())
+        // 6. Ambil Data dengan Pagination
         $transaksi = $transaksiQuery->latest('waktu')->paginate(10)->appends($request->query());
+
+        // 7. Olah/Transformasi data sensus wisatawan dengan format (L / N / M)
+        $transaksi->getCollection()->transform(function ($item) {
+            $lokal = 0;
+            $nusantara = 0;
+            $mancanegara = 0;
+
+            foreach ($item->details as $det) {
+                $namaKategori = optional($det->kategoriWisatawan)->nama_kategori_wisatawan;
+                
+                if (stripos($namaKategori, 'Nusantara') !== false) {
+                    $nusantara += $det->jumlah_jiwa;
+                } elseif (stripos($namaKategori, 'Mancanegara') !== false) {
+                    $mancanegara += $det->jumlah_jiwa;
+                } else {
+                    $lokal += $det->jumlah_jiwa;
+                }
+            }
+
+            $item->sensus_rangkuman = "{$lokal} / {$nusantara} / {$mancanegara}";
+            
+            return $item;
+        });
 
         return view('admin.laporan-transaksi', compact(
             'totalTransaksi',
