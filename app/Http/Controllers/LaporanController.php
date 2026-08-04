@@ -56,10 +56,29 @@ class LaporanController extends Controller
         $totalTransaksi = (clone $transaksiQuery)->count();
         $totalPendapatan = (clone $transaksiQuery)->sum('total_bayar');
 
-        // 6. Ambil Data dengan Pagination
+        // 6. Label Periode Teks Singkat
+        $labelPeriode = match ($filterType) {
+            'bulanan' => $request->filled('bulan') ? Carbon::createFromFormat('Y-m', $request->bulan)->translatedFormat('F Y') : 'Bulan Ini',
+            'tahunan' => 'Tahun ' . $request->input('tahun', date('Y')),
+            'triwulanan' => (function() use ($request) {
+                $t = $request->input('triwulan', 1);
+                $thn = $request->input('tahun_triwulan', date('Y'));
+                $namaBulan = match ((int)$t) {
+                    1 => 'Januari - Maret',
+                    2 => 'April - Juni',
+                    3 => 'Juli - September',
+                    4 => 'Oktober - Desember',
+                    default => ''
+                };
+                return "Tribulan {$t} ({$namaBulan}) {$thn}";
+            })(),
+            default => Carbon::parse($request->input('tanggal', date('Y-m-d')))->translatedFormat('d M Y'),
+        };
+
+        // 7. Ambil Data dengan Pagination
         $transaksi = $transaksiQuery->latest('waktu')->paginate(10)->appends($request->query());
 
-        // 7. Olah/Transformasi data sensus wisatawan dengan format (L / N / M)
+        // 8. Olah/Transformasi data sensus wisatawan dengan format (L / N / M)
         $transaksi->getCollection()->transform(function ($item) {
             $lokal = 0;
             $nusantara = 0;
@@ -87,7 +106,8 @@ class LaporanController extends Controller
             'totalPendapatan',
             'search',
             'transaksi',
-            'filterType'
+            'filterType',
+            'labelPeriode'
         ));
     }
 }

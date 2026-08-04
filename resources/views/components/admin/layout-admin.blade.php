@@ -33,5 +33,8 @@
     <!-- STACK UNTUK MENANGKAP SCRIPT DARI HALAMAN ANAK -->
     @stack('scripts')
 
+    <!-- TAMBAHKAN PEMANGGILAN SCRIPT FILTER DI SINI -->
+    <script src="{{ asset('resources/js/filter-laporan.js') }}"></script>
+
 </body>
 </html>
