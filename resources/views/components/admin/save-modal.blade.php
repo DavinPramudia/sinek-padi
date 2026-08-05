@@ -9,8 +9,8 @@
                 Batal
             </button>
             
-            {{-- Tombol Eksekusi Submit Form dari halaman pemanggil --}}
-            <button @click="$refs.saveForm.submit()" type="button" class="px-4 py-2 bg-[#C4C4FA] hover:bg-[#b0b0f7] text-[#0B0909] font-semibold text-xs rounded-lg transition cursor-pointer">
+            {{-- Ubah dari $refs.saveForm.submit() menjadi activeForm.submit() --}}
+            <button @click="activeForm.submit()" type="button" class="px-4 py-2 bg-[#C4C4FA] hover:bg-[#b0b0f7] text-[#0B0909] font-semibold text-xs rounded-lg transition cursor-pointer">
                 Ya, Simpan
             </button>
         </div>

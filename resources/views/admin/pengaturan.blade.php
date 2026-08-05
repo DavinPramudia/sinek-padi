@@ -1,5 +1,6 @@
 <x-admin.layout-admin title="Pengaturan Sistem">
-    <div class="flex flex-col h-full space-y-6 max-w-3xl">
+    {{-- Inisialisasi Alpine.js untuk kontrol modal dan form aktif --}}
+    <div class="flex flex-col h-full space-y-6 max-w-3xl" x-data="{ openSaveModal: false, activeForm: null }">
         
         <!-- HEADER -->
         <div>
@@ -38,7 +39,9 @@
                                 <span class="absolute left-3 text-xs text-[#d1d5dc] font-medium">Rp</span>
                                 <input type="number" name="harga_tarif" value="{{ $tarif->harga_tarif }}" class="bg-[#141c1a] border border-[#243733] text-white text-xs rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:border-[#3aafa9] w-36 font-semibold shadow-inner">
                             </div>
-                            <button type="submit" class="bg-[#3aafa9] hover:bg-[#2b8a85] text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-md active:scale-95 shrink-0">
+                            
+                            {{-- Tangkap form terdekat dan buka modal --}}
+                            <button type="button" @click="activeForm = $el.closest('form'); openSaveModal = true" class="bg-[#3aafa9] hover:bg-[#2b8a85] text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-md active:scale-95 shrink-0 cursor-pointer">
                                 Simpan
                             </button>
                         </div>
@@ -46,6 +49,11 @@
                 @endforeach
             </div>
         </div>
+
+        <!-- PANGGIL KOMPONEN MODAL TERPISAH -->
+        <x-admin.save-modal>
+            Apakah kamu yakin ingin menyimpan perubahan tarif ini?
+        </x-admin.save-modal>
 
     </div>
 </x-admin.layout-admin>
