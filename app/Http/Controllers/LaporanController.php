@@ -20,7 +20,7 @@ class LaporanController extends Controller
         // 2. Buat query dasar untuk transaksi
         $transaksiQuery = Transaksi::with(['details.kategoriWisatawan', 'user']);
 
-        // 3. Logika Penyaringan Berdasarkan Filter di Header (Menyesuaikan dengan Dashboard)
+        // 3. Logika Penyaringan Berdasarkan Filter di Header
         if ($filterType == 'harian') {
             $tanggalPilihan = $request->input('tanggal', date('Y-m-d'));
             $transaksiQuery->whereDate('waktu', $tanggalPilihan);
@@ -75,11 +75,11 @@ class LaporanController extends Controller
             default => Carbon::parse($request->input('tanggal', date('Y-m-d')))->translatedFormat('d M Y'),
         };
 
-        // 7. Ambil Data dengan Pagination
-        $transaksi = $transaksiQuery->latest('waktu')->paginate(10)->appends($request->query());
+        // 7. Ambil Data dengan ->get() (Tanpa Pagination)
+        $transaksi = $transaksiQuery->latest('waktu')->get();
 
         // 8. Olah/Transformasi data sensus wisatawan dengan format (L / N / M)
-        $transaksi->getCollection()->transform(function ($item) {
+        $transaksi->transform(function ($item) {
             $lokal = 0;
             $nusantara = 0;
             $mancanegara = 0;

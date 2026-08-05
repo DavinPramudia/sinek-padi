@@ -24,12 +24,11 @@
                 <input type="hidden" name="triwulan" value="{{ request('triwulan') }}">
                 <input type="hidden" name="tahun_triwulan" value="{{ request('tahun_triwulan') }}">
 
-                <!-- Ikon Search dipindah ke Kanan (right-0 pr-3) -->
+                <!-- Ikon Search di Kanan -->
                 <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[#d1d5dc]">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
                 </span>
 
-                <!-- Padding input disesuaikan: pl-4 di kiri, pr-9 di kanan agar teks tidak menabrak ikon -->
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari No. Tiket..." class="w-full bg-[#141c1a] border border-[#243733] text-[#EDEDED] text-xs rounded-xl pl-4 pr-9 py-2 focus:outline-none">
             </form>
 
@@ -50,12 +49,12 @@
             </div>
         </div>
 
-        <!-- TABEL LAPORAN TRANSAKSI -->
-        <div class="bg-[#141c1a] border border-[#243733] rounded-xl overflow-hidden flex-1 flex flex-col">
-            <div class="overflow-x-auto flex-1">
+        <!-- TABEL LAPORAN TRANSAKSI (Dengan Scroll Boks Internal) -->
+        <div class="bg-[#141c1a] border border-[#243733] rounded-xl overflow-hidden shadow-lg flex flex-col flex-1 min-h-0">
+            <div class="overflow-y-auto overflow-x-auto flex-1">
                 <table class="w-full text-left border-collapse text-xs">
-                    <thead>
-                        <tr class="bg-[#243733] text-[#EDEDED] uppercase tracking-wider">
+                    <thead class="sticky top-0 bg-[#243733] z-10">
+                        <tr class="text-[#EDEDED] uppercase tracking-wider">
                             <th class="p-3.5">No Tiket</th>
                             <th class="p-3.5">Waktu</th>
                             <th class="p-3.5">Kategori Kendaraan</th>
@@ -86,11 +85,6 @@
                         @endforelse
                     </tbody>
                 </table>
-            </div>
-
-            <!-- PAGINATION -->
-            <div class="p-4 border-t border-[#243733]">
-                {{ $transaksi->links() }}
             </div>
         </div>
 
