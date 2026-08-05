@@ -119,7 +119,7 @@
         </form>
 
         {{-- Panggil Komponen Modal Simpan --}}
-        <x-admin.save-modal>
+        <x-admin.save-modal title="Konfirmasi Simpan">
             Apakah kamu yakin ingin menyimpan akun baru ini?
         </x-admin.save-modal>
 

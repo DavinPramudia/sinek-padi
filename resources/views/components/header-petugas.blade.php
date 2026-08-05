@@ -18,6 +18,8 @@
         </button>
 
         {{-- Memanggil Komponen Modal yang Sudah Kita Buat --}}
-        <x-logout-modal />
+        <x-logout-modal title="Konfirmasi Logout">
+            Apakah kamu yakin ingin keluar ?
+        </x-logout-modal>
     </div>
 </nav>

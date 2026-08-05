@@ -25,7 +25,9 @@
         </div>
 
         {{-- Memanggil Komponen Modal Logout agar ada konfirmasi --}}
-        <x-logout-modal />
+        <x-logout-modal title="Konfirmasi Logout">
+            Apakah kamu yakin ingin keluar ?  
+        </x-logout-modal>
     </div>
     
 </header>

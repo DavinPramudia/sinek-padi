@@ -1,8 +1,9 @@
-{{-- Modal Konfirmasi Hapus --}}
 <div x-show="openDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" style="display: none;" x-cloak>
     <div class="bg-[#141c1a] border border-[#243733] p-6 rounded-xl shadow-xl max-w-sm w-full text-center space-y-4">
-        <h3 class="text-lg font-semibold text-[#EDEDED]">Konfirmasi Hapus</h3>
-        <p class="text-xs text-[#d1d5dc]">Apakah kamu yakin ingin menghapus akun ini? Data yang dihapus tidak dapat dikembalikan.</p>
+        <h3 class="text-lg font-semibold text-[#EDEDED]">{{ $title ?? 'Konfirmasi Hapus' }}</h3>
+        <p class="text-xs text-[#d1d5dc]">
+            {{ $slot ?? 'Apakah kamu yakin ingin menghapus data ini? Data yang dihapus tidak dapat dikembalikan.' }}
+        </p>
         
         <div class="flex justify-center space-x-3 pt-2">
             {{-- Tombol Batal --}}
