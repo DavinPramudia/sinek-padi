@@ -8,19 +8,23 @@ use Illuminate\Http\Request;
 use App\Models\Transaksi;
 use App\Models\DetailWisatawanTransaksi;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\LaporanTransaksiExport;
+use Illuminate\Support\Facades\DB;
 
 class LaporanController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * FUNGSI BANTUAN UNTUK FILTER (Agar tidak nulis ulang di index & exportExcel)
+     */
+    private function getQueryFilter(Request $request)
     {
-        // 1. Ambil jenis filter dan kata kunci pencarian
         $filterType = $request->input('filter_type', 'harian');
         $search = $request->input('search');
 
-        // 2. Buat query dasar untuk transaksi
         $transaksiQuery = Transaksi::with(['details.kategoriWisatawan', 'user']);
 
-        // 3. Logika Penyaringan Berdasarkan Filter di Header
+        // Logika Penyaringan Berdasarkan Filter di Header
         if ($filterType == 'harian') {
             $tanggalPilihan = $request->input('tanggal', date('Y-m-d'));
             $transaksiQuery->whereDate('waktu', $tanggalPilihan);
@@ -47,16 +51,30 @@ class LaporanController extends Controller
             $transaksiQuery->whereDate('waktu', today());
         }
 
-        // 4. Tambahan Fitur Pencarian No Karcis / No Tiket
+        // Tambahan Fitur Pencarian No Karcis / No Tiket
         if ($search) {
             $transaksiQuery->where('no_karcis', 'like', "%{$search}%");
         }
 
-        // 5. Data Statistik Kartu Atas (Mengikuti Filter)
+        return $transaksiQuery;
+    }
+
+    /**
+     * Method index (TIDAK BERUBAH)
+     */
+    public function index(Request $request)
+    {
+        $filterType = $request->input('filter_type', 'harian');
+        $search = $request->input('search');
+
+        // Panggil fungsi filter bantuan
+        $transaksiQuery = $this->getQueryFilter($request);
+
+        // Data Statistik Kartu Atas
         $totalTransaksi = (clone $transaksiQuery)->count();
         $totalPendapatan = (clone $transaksiQuery)->sum('total_bayar');
 
-        // 6. Label Periode Teks Singkat
+        // Label Periode Teks Singkat
         $labelPeriode = match ($filterType) {
             'bulanan' => $request->filled('bulan') ? Carbon::createFromFormat('Y-m', $request->bulan)->translatedFormat('F Y') : 'Bulan Ini',
             'tahunan' => 'Tahun ' . $request->input('tahun', date('Y')),
@@ -75,27 +93,37 @@ class LaporanController extends Controller
             default => Carbon::parse($request->input('tanggal', date('Y-m-d')))->translatedFormat('d M Y'),
         };
 
-        // 7. Ambil Data dengan ->get() (Tanpa Pagination)
+        // Ambil Data dengan ->get()
         $transaksi = $transaksiQuery->latest('waktu')->get();
 
-        // 8. Olah/Transformasi data sensus wisatawan dengan format (L / N / M)
         $transaksi->transform(function ($item) {
+            $details = DB::table('detail_wisatawan_transaksis')
+                ->join('kategori_wisatawans', 'detail_wisatawan_transaksis.id_kategori_wisatawan', '=', 'kategori_wisatawans.id_kategori_wisatawan')
+                ->where('detail_wisatawan_transaksis.id_transaksi', $item->id_transaksi)
+                ->select('kategori_wisatawans.nama_kategori_wisatawan', 'detail_wisatawan_transaksis.jumlah_jiwa')
+                ->get();
+
             $lokal = 0;
             $nusantara = 0;
             $mancanegara = 0;
 
-            foreach ($item->details as $det) {
-                $namaKategori = optional($det->kategoriWisatawan)->nama_kategori_wisatawan;
-                
-                if (stripos($namaKategori, 'Nusantara') !== false) {
-                    $nusantara += $det->jumlah_jiwa;
-                } elseif (stripos($namaKategori, 'Mancanegara') !== false) {
-                    $mancanegara += $det->jumlah_jiwa;
-                } else {
-                    $lokal += $det->jumlah_jiwa;
+            foreach ($details as $det) {
+                $nama = strtolower($det->nama_kategori_wisatawan);
+                $jumlahJiwa = (int) ($det->jumlah_jiwa ?? 0);
+
+                if (str_contains($nama, 'lokal')) {
+                    $lokal += $jumlahJiwa;
+                } elseif (str_contains($nama, 'nusantara')) {
+                    $nusantara += $jumlahJiwa;
+                } elseif (str_contains($nama, 'mancanegara') || str_contains($nama, 'asing')) {
+                    $mancanegara += $jumlahJiwa;
                 }
             }
 
+            // Simpan ke properti yang dibaca oleh Export Excel & View
+            $item->sensus_l = $lokal;
+            $item->sensus_n = $nusantara;
+            $item->sensus_m = $mancanegara;
             $item->sensus_rangkuman = "{$lokal} / {$nusantara} / {$mancanegara}";
             
             return $item;
@@ -109,5 +137,60 @@ class LaporanController extends Controller
             'filterType',
             'labelPeriode'
         ));
+    }
+
+    /**
+     * METHOD BARU: Untuk Mengunduh Excel Laporan Transaksi
+     */
+public function exportExcel(Request $request)
+    {
+        $filterType = $request->input('filter_type', 'harian');
+        $transaksiQuery = $this->getQueryFilter($request);
+        $transaksi = $transaksiQuery->latest('waktu')->get();
+
+        // Label Periode untuk di Excel
+        $labelPeriode = match ($filterType) {
+            'bulanan' => $request->filled('bulan') ? Carbon::createFromFormat('Y-m', $request->bulan)->translatedFormat('F Y') : 'Bulan Ini',
+            'tahunan' => 'Tahun ' . $request->input('tahun', date('Y')),
+            'triwulanan' => 'Triwulan ' . $request->input('triwulan', 1) . ' Tahun ' . $request->input('tahun_triwulan', date('Y')),
+            'rentang' => 'Rentang Tanggal',
+            default => Carbon::parse($request->input('tanggal', date('Y-m-d')))->translatedFormat('d M Y'),
+        };
+
+        // SALIN LOGIKA YANG BERHASIL DARI INDEX KE SINI
+        $transaksi->transform(function ($item) {
+            $details = \Illuminate\Support\Facades\DB::table('detail_wisatawan_transaksis')
+                ->join('kategori_wisatawans', 'detail_wisatawan_transaksis.id_kategori_wisatawan', '=', 'kategori_wisatawans.id_kategori_wisatawan')
+                ->where('detail_wisatawan_transaksis.id_transaksi', $item->id_transaksi)
+                ->select('kategori_wisatawans.nama_kategori_wisatawan', 'detail_wisatawan_transaksis.jumlah_jiwa')
+                ->get();
+
+            $lokal = 0;
+            $nusantara = 0;
+            $mancanegara = 0;
+
+            foreach ($details as $det) {
+                $nama = strtolower($det->nama_kategori_wisatawan);
+                $jumlahJiwa = (int) ($det->jumlah_jiwa ?? 0);
+
+                if (str_contains($nama, 'lokal')) {
+                    $lokal += $jumlahJiwa;
+                } elseif (str_contains($nama, 'nusantara')) {
+                    $nusantara += $jumlahJiwa;
+                } elseif (str_contains($nama, 'mancanegara') || str_contains($nama, 'asing')) {
+                    $mancanegara += $jumlahJiwa;
+                }
+            }
+
+            // Wajib mendefinisikan properti ini agar dibaca oleh LaporanTransaksiExport
+            $item->sensus_l = $lokal;
+            $item->sensus_n = $nusantara;
+            $item->sensus_m = $mancanegara;
+            $item->sensus_rangkuman = "{$lokal} / {$nusantara} / {$mancanegara}";
+            
+            return $item;
+        });
+
+        return Excel::download(new LaporanTransaksiExport($transaksi, $labelPeriode), 'Laporan-Transaksi-SINEK-PADI.xlsx');
     }
 }
