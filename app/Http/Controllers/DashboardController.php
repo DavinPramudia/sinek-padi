@@ -3,20 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\KategoriWisatawan;
-use App\Models\Kendaraan;
 use Illuminate\Http\Request;
 use App\Models\Transaksi;
 use App\Models\DetailWisatawanTransaksi;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\DashboardExport;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * Dapur pusat logika query dan filter (Digunakan bersama oleh index & export)
+     */
+    private function getDashboardData(Request $request)
     {
-        // Ambil jenis filter yang dipilih (default 'harian')
         $filterType = $request->input('filter_type', 'harian');
-
-        // Buat query dasar untuk transaksi
         $transaksiQuery = Transaksi::query();
 
         // 1. Logika Penyaringan Berdasarkan Filter di Header
@@ -77,7 +78,6 @@ class DashboardController extends Controller
         $labelsGrafik = [];
 
         if ($filterType == 'bulanan' && $request->filled('bulan')) {
-            // Jika Bulanan: Ambil data per hari dalam bulan tersebut
             $tahunBulan = explode('-', $request->bulan);
             $jumlahHari = Carbon::create($tahunBulan[0], $tahunBulan[1])->daysInMonth;
             
@@ -85,21 +85,19 @@ class DashboardController extends Controller
                 $tanggalLengkap = $request->bulan . '-' . str_pad($hari, 2, '0', STR_PAD_LEFT);
                 $jumlah = (clone $transaksiQuery)->whereDate('waktu', $tanggalLengkap)->count();
                 $trenKunjungan[] = $jumlah;
-                $labelsGrafik[] = (string) $hari; // Label: 1, 2, 3, ... 31
+                $labelsGrafik[] = (string) $hari;
             }
         } 
         elseif ($filterType == 'tahunan' && $request->filled('tahun')) {
-            // Jika Tahunan: Ambil data per bulan (Jan - Des)
             for ($bulan = 1; $bulan <= 12; $bulan++) {
                 $jumlah = (clone $transaksiQuery)->whereYear('waktu', $request->tahun)
-                                                 ->whereMonth('waktu', $bulan)
-                                                 ->count();
+                                               ->whereMonth('waktu', $bulan)
+                                               ->count();
                 $trenKunjungan[] = $jumlah;
-                $labelsGrafik[] = Carbon::create(null, $bulan)->translatedFormat('M'); // Jan, Feb...
+                $labelsGrafik[] = Carbon::create(null, $bulan)->translatedFormat('M');
             }
         } 
         elseif ($filterType == 'triwulanan') {
-            // Jika Triwulanan: Ambil data per 3 bulan dalam triwulan tersebut
             $tahun = $request->input('tahun_triwulan', date('Y'));
             $triwulan = $request->input('triwulan', 1);
 
@@ -108,18 +106,17 @@ class DashboardController extends Controller
 
             for ($bulan = $bulanMulai; $bulan <= $bulanSelesai; $bulan++) {
                 $jumlah = (clone $transaksiQuery)->whereYear('waktu', $tahun)
-                                                 ->whereMonth('waktu', $bulan)
-                                                 ->count();
+                                               ->whereMonth('waktu', $bulan)
+                                               ->count();
                 $trenKunjungan[] = $jumlah;
-                $labelsGrafik[] = Carbon::create(null, $bulan)->translatedFormat('M'); // Misal: Jan, Feb, Mar
+                $labelsGrafik[] = Carbon::create(null, $bulan)->translatedFormat('M');
             }
         }
         else {
-            // Jika Harian / Rentang / Lainnya: Ambil data per jam (06:00 s.d 21:00)
             for ($jam = 6; $jam <= 21; $jam++) {
                 $jumlah = (clone $transaksiQuery)->whereRaw('HOUR(waktu) = ?', [$jam])->count();
                 $trenKunjungan[] = $jumlah;
-                $labelsGrafik[] = str_pad($jam, 2, '0', STR_PAD_LEFT) . ':00'; // Label: 06:00, 07:00...
+                $labelsGrafik[] = str_pad($jam, 2, '0', STR_PAD_LEFT) . ':00';
             }
         }
 
@@ -145,26 +142,42 @@ class DashboardController extends Controller
             default => Carbon::parse($request->input('tanggal', date('Y-m-d')))->translatedFormat('d M Y'),
         };
 
-        // Satuan waktu untuk judul grafik
         $satuanWaktu = match ($filterType) {
             'bulanan' => 'Perhari',
-            'tahunan', 'triwulanan' => 'Perbulan', // Triwulanan kini menggunakan satuan per bulan
+            'tahunan', 'triwulanan' => 'Perbulan',
             default => 'Perjam',
         };
 
-        // 7. Pengaturan Skala Maksimal & Step Grafik Berdasarkan Filter
         $chartConfig = match ($filterType) {
             'bulanan' => ['max' => 300, 'step' => 50],
             'tahunan' => ['max' => 10000, 'step' => 1000],
-            'triwulanan' => ['max' => 3000, 'step' => 500], // Sesuaikan skala untuk triwulanan (3 bulan)
-            default => ['max' => 50, 'step' => 10], // Untuk harian / rentang / tanggal
+            'triwulanan' => ['max' => 3000, 'step' => 500],
+            default => ['max' => 50, 'step' => 10],
         };
 
-        return view('admin.dashboard', compact(
+        return compact(
             'totalPendapatan', 'totalKendaraan', 'totalWisatawan',
             'wisatawanLokal', 'wisatawanNusantara', 'wisatawanMancanegara',
             'kendaraanMotor', 'kendaraanMobil', 'trenKunjungan', 'labelsGrafik', 
-            'labelPeriode', 'satuanWaktu', 'chartConfig' // <-- Masukkan ke compact
-        ));
+            'labelPeriode', 'satuanWaktu', 'chartConfig'
+        );
+    }
+
+    /**
+     * Method index (Struktur aslinya dijaga tetap utuh)
+     */
+    public function index(Request $request)
+    {
+        $data = $this->getDashboardData($request);
+        return view('admin.dashboard', $data);
+    }
+
+    /**
+     * Method exportExcel menggunakan data dari sumber yang sama tanpa duplikasi kode
+     */
+    public function exportExcel(Request $request)
+    {
+        $data = $this->getDashboardData($request);
+        return Excel::download(new DashboardExport($data), 'Rekap-Dashboard-SINEK-PADI.xlsx');
     }
 }

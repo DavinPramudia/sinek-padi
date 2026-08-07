@@ -12,6 +12,16 @@
             <x-admin.filter-header :routeAction="route('admin.dashboard')" />
         </div>
 
+            <div class="flex flex-col sm:flex-row justify-end items-end sm:items-center gap-3">
+                <!-- Tombol Unduh Rekap (Dihubungkan ke rute exportExcel di DashboardController) -->
+                <a href="{{ route('admin.dashboard.export', request()->all()) }}" class="bg-[#141c1a] border border-[#243733] text-[#EDEDED] hover:bg-[#243733] text-xs font-semibold px-4 py-2.5 rounded-xl transition flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#3aafa9" class="size-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    </svg>
+                    <span>Unduh Rekap</span>
+                </a>
+            </div>    
+
         <!-- MAIN GRID CONTENT -->
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1">
             

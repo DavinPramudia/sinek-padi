@@ -26,6 +26,9 @@ Route::middleware(['auth'])->group(function () {
 
     // 2. Halaman Admin Dashboard (Diubah menggunakan DashboardController)
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+    
+    // Route Export Excel Dashboard
+    Route::get('/admin/dashboard/export-excel', [DashboardController::class, 'exportExcel'])->name('admin.dashboard.export');
 
     // 3. Route untuk menyimpan transaksi
     Route::post('/transaksi/store', [LoketController::class, 'store'])->name('transaksi.store');
