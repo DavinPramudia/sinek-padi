@@ -70,7 +70,7 @@ class LaporanController extends Controller
         // Panggil fungsi filter bantuan
         $transaksiQuery = $this->getQueryFilter($request);
 
-        // Data Statistik Kartu Atas
+        // Data Statistik Kartu Atas (Wajib di-clone agar tidak terpotong pagination)
         $totalTransaksi = (clone $transaksiQuery)->count();
         $totalPendapatan = (clone $transaksiQuery)->sum('total_bayar');
 
@@ -93,10 +93,14 @@ class LaporanController extends Controller
             default => Carbon::parse($request->input('tanggal', date('Y-m-d')))->translatedFormat('d M Y'),
         };
 
-        // Ambil Data dengan ->get()
-        $transaksi = $transaksiQuery->latest('waktu')->get();
+        // Ganti ->get() dengan ->paginate(10) dan onEachSide(1) untuk batasan maksimal 3 angka
+        $transaksi = $transaksiQuery->latest('waktu')
+                                    ->paginate(3)
+                                    ->onEachSide(1)
+                                    ->withQueryString();
 
-        $transaksi->transform(function ($item) {
+        // Transform data pada paginator items
+        $transaksi->getCollection()->transform(function ($item) {
             $details = DB::table('detail_wisatawan_transaksis')
                 ->join('kategori_wisatawans', 'detail_wisatawan_transaksis.id_kategori_wisatawan', '=', 'kategori_wisatawans.id_kategori_wisatawan')
                 ->where('detail_wisatawan_transaksis.id_transaksi', $item->id_transaksi)
@@ -120,7 +124,7 @@ class LaporanController extends Controller
                 }
             }
 
-            // Simpan ke properti yang dibaca oleh Export Excel & View
+            // Simpan ke properti yang dibaca oleh View
             $item->sensus_l = $lokal;
             $item->sensus_n = $nusantara;
             $item->sensus_m = $mancanegara;

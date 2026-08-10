@@ -52,8 +52,10 @@
             </div>
         </div>
 
-        <!-- TABEL LAPORAN TRANSAKSI (Dengan Scroll Boks Internal) -->
+        <!-- TABEL LAPORAN TRANSAKSI (Dengan Scroll Boks Internal & Pagination) -->
         <div class="bg-[#141c1a] border border-[#243733] rounded-xl overflow-hidden shadow-lg flex flex-col flex-1 min-h-0">
+            
+            {{-- Area Scroll Tabel --}}
             <div class="overflow-y-auto overflow-x-auto flex-1">
                 <table class="w-full text-left border-collapse text-xs">
                     <thead class="sticky top-0 bg-[#243733] z-10">
@@ -88,6 +90,11 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+
+            <!-- BAGIAN PAGINATION (Dipatok rapi di bagian bawah boks tabel) -->
+            <div class="p-3 border-t border-[#243733] text-xs text-[#d1d5dc] bg-[#141c1a] shrink-0">
+                {{ $transaksi->links() }}
             </div>
         </div>
 

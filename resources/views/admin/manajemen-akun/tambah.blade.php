@@ -112,8 +112,9 @@
 
             <div class="pt-4">
                 {{-- Tombol Simpan dengan validasi HTML5 sebelum memunculkan modal konfirmasi --}}
-                <button @click="if ($refs.saveForm.checkValidity()) { openSaveModal = true; } else { $refs.saveForm.reportValidity(); }" type="button" class="bg-[#C4C4FA] text-[#0B0909] font-semibold text-xs px-6 py-2.5 rounded-lg hover:bg-[#b0b0f7] transition cursor-pointer">
+                <button @click="activeForm = $refs.saveForm; if (activeForm.checkValidity()) { openSaveModal = true; } else { activeForm.reportValidity(); }" type="button" class="bg-[#C4C4FA] text-[#0B0909] font-semibold text-xs px-6 py-2.5 rounded-lg hover:bg-[#b0b0f7] transition cursor-pointer">
                     Simpan
+                </>
                 </button>
             </div>
         </form>
