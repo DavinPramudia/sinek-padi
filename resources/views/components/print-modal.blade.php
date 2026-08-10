@@ -50,16 +50,20 @@
             
             {{-- JIKA PILIH PRINT FISIK --}}
             <div x-show="metodePilihan === 'print'">
-                <a :href="urlCetak" target="_blank" @click="resetForm()" class="block w-full px-4 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-lg transition cursor-pointer shadow-lg active:scale-95">
+                <button type="button" 
+                        @click="window.open(urlCetak, '_blank'); resetForm();" 
+                        class="block w-full px-4 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-lg transition cursor-pointer shadow-lg active:scale-95">
                     Cetak Karcis & Selesai
-                </a>
+                </button>
             </div>
 
             {{-- JIKA PILIH E-TICKET --}}
             <div x-show="metodePilihan === 'e-ticket'">
-                <a :href="urlCetak" target="_blank" @click="resetForm()" class="block w-full px-4 py-3 bg-green-600 hover:bg-green-500 text-white font-bold text-sm rounded-lg transition cursor-pointer shadow-lg active:scale-95">
+                <button type="button" 
+                        @click="window.open(urlCetak, '_blank'); resetForm();" 
+                        class="block w-full px-4 py-3 bg-green-600 hover:bg-green-500 text-white font-bold text-sm rounded-lg transition cursor-pointer shadow-lg active:scale-95">
                     Download E-Ticket & Selesai
-                </a>
+                </button>
             </div>
         </div>
 

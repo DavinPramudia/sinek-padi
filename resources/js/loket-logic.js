@@ -60,21 +60,22 @@ document.addEventListener('alpine:init', () => {
                 });
 
                 const data = await response.json();
+                console.log("Respon dari server:", data);
 
                 if (data.status === 'sukses') {
-                    this.tahap = 'sukses';
-                    this.urlCetak = data.url_print; 
+                    // TAMBAHKAN INI: Menyisipkan parameter ?mode=print atau ?mode=e-ticket
+                    this.urlCetak = data.url_print + '?mode=' + this.metodePilihan; 
+                    
+                    this.tahap = 'sukses'; 
                 } else {
-                    // Jika gagal simpan, pakai modal custom juga!
-                    this.openPrintModal = false; // Tutup modal print dulu
+                    this.openPrintModal = false;
                     this.alertMessage = 'Gagal menyimpan transaksi!';
                     this.openAlertModal = true;
                     this.tahap = 'pilih';
                 }
             } catch (error) {
-                console.error("Error:", error);
-                // Jika error sistem, pakai modal custom juga!
-                this.openPrintModal = false; // Tutup modal print dulu
+                console.error("Error Detail:", error);
+                this.openPrintModal = false;
                 this.alertMessage = 'Terjadi kesalahan sistem.';
                 this.openAlertModal = true;
                 this.tahap = 'pilih';

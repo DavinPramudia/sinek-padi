@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;  
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class LoketController extends Controller
 {
@@ -173,7 +174,7 @@ class LoketController extends Controller
         }
     }
 
-    public function cetak($id)
+    public function cetak(Request $request, $id)
     {
         $transaksi = DB::table('transaksis')
             ->join('tarifs', 'transaksis.id_tarif', '=', 'tarifs.id_tarif')
@@ -185,6 +186,25 @@ class LoketController extends Controller
             abort(404, 'Data transaksi tidak ditemukan.');
         }
 
+        $transaksi->details = DB::table('detail_wisatawan_transaksis')
+            ->join('kategori_wisatawans', 'detail_wisatawan_transaksis.id_kategori_wisatawan', '=', 'kategori_wisatawans.id_kategori_wisatawan')
+            ->where('detail_wisatawan_transaksis.id_transaksi', $id)
+            ->select('kategori_wisatawans.nama_kategori_wisatawan', 'detail_wisatawan_transaksis.jumlah_jiwa')
+            ->get();
+
+        $mode = $request->query('mode', 'print');
+
+        // JIKA PILIH E-TICKET: Download sebagai file PDF berukuran thermal
+        if ($mode === 'e-ticket') {
+        // Mengubah ukuran dari [0, 0, 164, 300] menjadi [0, 0, 226, 350] 
+        // 226 setara dengan lebar kertas 80mm agar nomor tiket muat ke samping
+        $pdf = Pdf::loadView('transaksi.cetak-struk', compact('transaksi'))
+                  ->setPaper([0, 0, 226, 350], 'portrait'); 
+
+        return $pdf->download('E-Ticket-' . $transaksi->no_karcis . '.pdf');
+    }
+
+        // JIKA PILIH PRINT FISIK: Tampilkan halaman web struk biasa untuk langsung cetak thermal
         return view('transaksi.cetak-struk', compact('transaksi'));
     }
 }
