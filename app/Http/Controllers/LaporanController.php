@@ -95,7 +95,7 @@ class LaporanController extends Controller
 
         // Ganti ->get() dengan ->paginate(10) dan onEachSide(1) untuk batasan maksimal 3 angka
         $transaksi = $transaksiQuery->latest('waktu')
-                                    ->paginate(3)
+                                    ->paginate(5)
                                     ->onEachSide(1)
                                     ->withQueryString();
 
