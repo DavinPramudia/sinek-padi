@@ -83,6 +83,15 @@
         <p style="font-size: 10px; margin: 2px 0;">Simpan karcis ini sebagai bukti sah.</p>
     </div>
 
+{{-- Tombol hanya akan muncul jika bukan mode e-ticket (PDF) --}}
+    @if(request('mode') !== 'e-ticket')
+    <div class="text-center no-print" style="margin-top: 20px; margin-bottom: 20mm;">
+        <button onclick="window.print()" style="padding: 6px 12px;">
+            Cetak Ulang Struk
+        </button>
+    </div>
+    @endif
+
 
 </body>
 </html>
