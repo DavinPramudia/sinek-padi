@@ -6,16 +6,16 @@
     <style>
         /* Pengaturan mutlak untuk ukuran kertas thermal gulung */
         @page {
-            size: 54mm 80mm; /* Lebar 58mm, panjang otomatis dibatasi maksimal 200mm agar tidak kepanjangan */
-            margin: 0;
+            size: 58mm 85mm; /* Lebar 58mm, panjang otomatis dibatasi maksimal 200mm agar tidak kepanjangan */
+            margin: 2mm;
         }
 
         body {
-            font-family: 'Courier New', Courier, monospace;
+            font-family: "Courier", "Courier New", monospace !important;            
             font-size: 11px;
             width: 54mm; /* Dibuat sedikit di bawah 58mm agar ada sisa margin aman */
             margin: 0 auto;
-            padding: 5px;
+            padding: 2px;
             color: #000;
             background: #fff;
             box-sizing: border-box;
@@ -33,7 +33,9 @@
                 margin: 0;
                 padding: 2mm;
             }
-            .no-print { display: none !important; }
+            .no-print { 
+                display: none !important; 
+            }
         }
     </style>
 </head>
@@ -55,21 +57,25 @@
 
     <div class="border-dashed"></div>
 
-    <p class="font-bold" style="margin: 4px 0;">Rincian Wisatawan:</p>
+    <div class="font-bold" style="margin-bottom: 3px;">Rincian Wisatawan:</div>
     
-    @foreach($transaksi->details as $det)
-        <div class="flex-between" style="margin: 2px 0;">
-            <span>- {{ $det->nama_kategori_wisatawan }}</span>
-            <span>{{ $det->jumlah_jiwa }} Jiwa</span>
-        </div>
-    @endforeach
+    <table style="width: 100%; border-collapse: collapse;">
+        @foreach($transaksi->details as $det)
+            <tr>
+                <td style="padding: 2px 0;">- {{ $det->nama_kategori_wisatawan }}</td>
+                <td style="text-align: right; padding: 2px 0;">{{ $det->jumlah_jiwa }} Jiwa</td>
+            </tr>
+        @endforeach
+    </table>
 
     <div class="border-dashed"></div>
 
-    <div class="flex-between font-bold" style="margin: 6px 0;">
-        <span>TOTAL BAYAR</span>
-        <span>Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }}</span>
-    </div>
+    <table style="width: 100%;">
+        <tr class="font-bold" style="font-size: 12px;">
+            <td>TOTAL BAYAR</td>
+            <td style="text-align: right;">Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }}</td>
+        </tr>
+    </table>
 
     <div class="border-dashed"></div>
     <div class="text-center" style="margin-top: 10px;">
@@ -77,12 +83,6 @@
         <p style="font-size: 10px; margin: 2px 0;">Simpan karcis ini sebagai bukti sah.</p>
     </div>
 
-    <!-- Tombol manual dengan inline style display:none khusus untuk PDF, atau memanfaatkan class no-print -->
-    <div class="text-center no-print" style="margin-top: 20px;">
-        <button onclick="window.print()" style="padding: 6px 12px; font-size: 12px; cursor: pointer; background: #000; color: #fff; border: none; border-radius: 4px;">
-            Cetak Ulang Struk
-        </button>
-    </div>
 
 </body>
 </html>

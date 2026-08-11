@@ -196,10 +196,9 @@ class LoketController extends Controller
 
         // JIKA PILIH E-TICKET: Download sebagai file PDF berukuran thermal
         if ($mode === 'e-ticket') {
-        // Mengubah ukuran dari [0, 0, 164, 300] menjadi [0, 0, 226, 350] 
-        // 226 setara dengan lebar kertas 80mm agar nomor tiket muat ke samping
+
         $pdf = Pdf::loadView('transaksi.cetak-struk', compact('transaksi'))
-                  ->setPaper([0, 0, 226, 350], 'portrait'); 
+                  ->setPaper([0, 0, 164, 350], 'portrait'); 
 
         return $pdf->download('E-Ticket-' . $transaksi->no_karcis . '.pdf');
     }
