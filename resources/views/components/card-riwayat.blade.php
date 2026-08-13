@@ -42,7 +42,7 @@
                         <td class="py-3.5 font-bold text-[#3aafa9] text-sm">Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }}</td>
                         <td class="py-3.5 text-center">
                             {{-- Tombol print ulang langsung membuka route cetak berdasarkan ID --}}
-                            <a href="{{ route('transaksi.cetak', $transaksi->id_transaksi) }}" target="_blank" 
+                            <a href="{{ route('transaksi.cetak', $transaksi->id_transaksi) }}?reprint=true" target="_blank" 
                                class="inline-flex border border-[#3aafa9] text-[#3aafa9] hover:bg-[#3aafa9] hover:text-[#0B0909] text-[10px] font-bold py-1.5 px-3 rounded-xl transition duration-150 items-center justify-center space-x-1.5 active:scale-95 cursor-pointer">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 000-4H9a2 2 0 000 4zm8-12V5a2 2 0 00-2-2H7a2 2 0 00-2 2v4h14z"></path>

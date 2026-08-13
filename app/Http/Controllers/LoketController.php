@@ -155,6 +155,13 @@ class LoketController extends Controller
             abort(404, 'Data transaksi tidak ditemukan.');
         }
 
+        // --- TAMBAHKAN LOGIKA REPRINT DI SINI ---
+        // Jika URL membawa parameter ?reprint=true, maka tambah reprint_count +1
+        if ($request->has('reprint') && $request->reprint == 'true') {
+            $transaksi->increment('reprint_count');
+        }
+        // ----------------------------------------
+
         $transaksi->details = DetailWisatawanTransaksi::with('kategoriWisatawan')
             ->where('id_transaksi', $id)
             ->get()
@@ -171,7 +178,7 @@ class LoketController extends Controller
 
         if ($mode === 'e-ticket') {
             $pdf = Pdf::loadView('transaksi.cetak-struk', compact('transaksi'))
-                      ->setPaper([0, 0, 164, 350], 'portrait'); 
+                        ->setPaper([0, 0, 164, 350], 'portrait'); 
 
             return $pdf->download('E-Ticket-' . $transaksi->no_karcis . '.pdf');
         }
