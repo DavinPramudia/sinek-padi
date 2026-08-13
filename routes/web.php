@@ -33,6 +33,8 @@ Route::middleware(['auth'])->group(function () {
 
     // 4. Route untuk cetak karcis
     Route::get('/transaksi/cetak/{id}', [LoketController::class, 'cetak'])->name('transaksi.cetak');
+
+    Route::get('/transaksi/qrcode/{id}', [LoketController::class, 'qrcode'])->name('transaksi.qrcode');
     
     // 5. Halaman Laporan Transaksi Admin
     Route::get('/admin/laporan-transaksi', [LaporanController::class, 'index'])->name('admin.laporan-transaksi');
