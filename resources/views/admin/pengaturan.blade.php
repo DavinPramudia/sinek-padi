@@ -40,8 +40,8 @@
                                 <input type="number" name="harga_tarif" value="{{ $tarif->harga_tarif }}" class="bg-[#141c1a] border border-[#243733] text-white text-xs rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:border-[#3aafa9] w-36 font-semibold shadow-inner">
                             </div>
                             
-                            {{-- Tangkap form terdekat dan buka modal --}}
-                            <button type="button" @click="activeForm = $el.closest('form'); openSaveModal = true" class="bg-[#3aafa9] hover:bg-[#2b8a85] text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-md active:scale-95 shrink-0 cursor-pointer">
+                            {{-- PERBAIKAN DI SINI: Tambahkan kata "window." di depan activeForm --}}
+                            <button type="button" @click="window.activeForm = $el.closest('form'); openSaveModal = true" class="bg-[#3aafa9] hover:bg-[#2b8a85] text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-md active:scale-95 shrink-0 cursor-pointer">
                                 Simpan
                             </button>
                         </div>

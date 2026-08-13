@@ -9,7 +9,7 @@ class DetailWisatawanTransaksi extends Model
 {
     protected $table = 'detail_wisatawan_transaksis'; 
     protected $primaryKey = 'id_detail_wisatawan_transaksi'; 
-    protected $fillable = ['id_transaksi', 'id_kategori', 'jumlah_jiwa']; 
+    protected $fillable = ['id_transaksi', 'id_kategori_wisatawan', 'jumlah_jiwa']; 
 
     public function transaksi(): BelongsTo
     {
@@ -18,6 +18,6 @@ class DetailWisatawanTransaksi extends Model
 
     public function kategoriWisatawan(): BelongsTo
     {
-        return $this->belongsTo(KategoriWisatawan::class, 'id_kategori', 'id_kategori');
+        return $this->belongsTo(KategoriWisatawan::class, 'id_kategori_wisatawan', 'id_kategori_wisatawan');
     }
 }

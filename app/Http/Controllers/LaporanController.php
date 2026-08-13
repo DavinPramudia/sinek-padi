@@ -1,28 +1,24 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use App\Models\KategoriWisatawan;
-use App\Models\Kendaraan;
 use Illuminate\Http\Request;
 use App\Models\Transaksi;
-use App\Models\DetailWisatawanTransaksi;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\LaporanTransaksiExport;
-use Illuminate\Support\Facades\DB;
 
 class LaporanController extends Controller
 {
     /**
-     * FUNGSI BANTUAN UNTUK FILTER (Agar tidak nulis ulang di index & exportExcel)
+     * FUNGSI BANTUAN UNTUK FILTER (Eager Loading relasi yang dibutuhkan)
      */
     private function getQueryFilter(Request $request)
     {
         $filterType = $request->input('filter_type', 'harian');
         $search = $request->input('search');
 
-        $transaksiQuery = Transaksi::with(['details.kategoriWisatawan', 'user']);
+        // Memuat relasi details, kategoriWisatawan, user, dan tarif.kendaraan sekaligus (Eager Loading)
+        $transaksiQuery = Transaksi::with(['details.kategoriWisatawan', 'user', 'tarif.kendaraan']);
 
         // Logika Penyaringan Berdasarkan Filter di Header
         if ($filterType == 'harian') {
@@ -60,17 +56,16 @@ class LaporanController extends Controller
     }
 
     /**
-     * Method index (TIDAK BERUBAH)
+     * Method index
      */
     public function index(Request $request)
     {
         $filterType = $request->input('filter_type', 'harian');
         $search = $request->input('search');
 
-        // Panggil fungsi filter bantuan
         $transaksiQuery = $this->getQueryFilter($request);
 
-        // Data Statistik Kartu Atas (Wajib di-clone agar tidak terpotong pagination)
+        // Data Statistik Kartu Atas
         $totalTransaksi = (clone $transaksiQuery)->count();
         $totalPendapatan = (clone $transaksiQuery)->sum('total_bayar');
 
@@ -93,26 +88,21 @@ class LaporanController extends Controller
             default => Carbon::parse($request->input('tanggal', date('Y-m-d')))->translatedFormat('d M Y'),
         };
 
-        // Ganti ->get() dengan ->paginate(10) dan onEachSide(1) untuk batasan maksimal 3 angka
+        // Pagination
         $transaksi = $transaksiQuery->latest('waktu')
                                     ->paginate(5)
                                     ->onEachSide(1)
                                     ->withQueryString();
 
-        // Transform data pada paginator items
+        // Transform data menggunakan relasi Eloquent (Bersih dari DB::table manual)
         $transaksi->getCollection()->transform(function ($item) {
-            $details = DB::table('detail_wisatawan_transaksis')
-                ->join('kategori_wisatawans', 'detail_wisatawan_transaksis.id_kategori_wisatawan', '=', 'kategori_wisatawans.id_kategori_wisatawan')
-                ->where('detail_wisatawan_transaksis.id_transaksi', $item->id_transaksi)
-                ->select('kategori_wisatawans.nama_kategori_wisatawan', 'detail_wisatawan_transaksis.jumlah_jiwa')
-                ->get();
-
             $lokal = 0;
             $nusantara = 0;
             $mancanegara = 0;
 
-            foreach ($details as $det) {
-                $nama = strtolower($det->nama_kategori_wisatawan);
+            // Membaca langsung dari relasi $item->details yang sudah dimuat lewat Eager Loading
+            foreach ($item->details as $det) {
+                $nama = strtolower($det->kategoriWisatawan->nama_kategori_wisatawan ?? '');
                 $jumlahJiwa = (int) ($det->jumlah_jiwa ?? 0);
 
                 if (str_contains($nama, 'lokal')) {
@@ -124,7 +114,6 @@ class LaporanController extends Controller
                 }
             }
 
-            // Simpan ke properti yang dibaca oleh View
             $item->sensus_l = $lokal;
             $item->sensus_n = $nusantara;
             $item->sensus_m = $mancanegara;
@@ -144,15 +133,14 @@ class LaporanController extends Controller
     }
 
     /**
-     * METHOD BARU: Untuk Mengunduh Excel Laporan Transaksi
+     * Method exportExcel
      */
-public function exportExcel(Request $request)
+    public function exportExcel(Request $request)
     {
         $filterType = $request->input('filter_type', 'harian');
         $transaksiQuery = $this->getQueryFilter($request);
         $transaksi = $transaksiQuery->latest('waktu')->get();
 
-        // Label Periode untuk di Excel
         $labelPeriode = match ($filterType) {
             'bulanan' => $request->filled('bulan') ? Carbon::createFromFormat('Y-m', $request->bulan)->translatedFormat('F Y') : 'Bulan Ini',
             'tahunan' => 'Tahun ' . $request->input('tahun', date('Y')),
@@ -161,20 +149,13 @@ public function exportExcel(Request $request)
             default => Carbon::parse($request->input('tanggal', date('Y-m-d')))->translatedFormat('d M Y'),
         };
 
-        // SALIN LOGIKA YANG BERHASIL DARI INDEX KE SINI
         $transaksi->transform(function ($item) {
-            $details = \Illuminate\Support\Facades\DB::table('detail_wisatawan_transaksis')
-                ->join('kategori_wisatawans', 'detail_wisatawan_transaksis.id_kategori_wisatawan', '=', 'kategori_wisatawans.id_kategori_wisatawan')
-                ->where('detail_wisatawan_transaksis.id_transaksi', $item->id_transaksi)
-                ->select('kategori_wisatawans.nama_kategori_wisatawan', 'detail_wisatawan_transaksis.jumlah_jiwa')
-                ->get();
-
             $lokal = 0;
             $nusantara = 0;
             $mancanegara = 0;
 
-            foreach ($details as $det) {
-                $nama = strtolower($det->nama_kategori_wisatawan);
+            foreach ($item->details as $det) {
+                $nama = strtolower($det->kategoriWisatawan->nama_kategori_wisatawan ?? '');
                 $jumlahJiwa = (int) ($det->jumlah_jiwa ?? 0);
 
                 if (str_contains($nama, 'lokal')) {
@@ -186,7 +167,6 @@ public function exportExcel(Request $request)
                 }
             }
 
-            // Wajib mendefinisikan properti ini agar dibaca oleh LaporanTransaksiExport
             $item->sensus_l = $lokal;
             $item->sensus_n = $nusantara;
             $item->sensus_m = $mancanegara;

@@ -12,9 +12,6 @@ use App\Exports\DashboardExport;
 
 class DashboardController extends Controller
 {
-    /**
-     * Dapur pusat logika query dan filter (Digunakan bersama oleh index & export)
-     */
     private function getDashboardData(Request $request)
     {
         $filterType = $request->input('filter_type', 'harian');
@@ -53,25 +50,35 @@ class DashboardController extends Controller
 
         // Ambil ID transaksi yang lolos filter untuk menghitung detail wisatawan
         $transaksiIds = (clone $transaksiQuery)->pluck('id_transaksi');
-        $totalWisatawan = DetailWisatawanTransaksi::whereIn('id_transaksi', $transaksiIds)->count();
+        
+        // Perbaikan: Menggunakan sum('jumlah_jiwa') alih-alih count() agar menghitung jumlah orang, bukan jumlah baris transaksi
+        $totalWisatawan = DetailWisatawanTransaksi::whereIn('id_transaksi', $transaksiIds)->sum('jumlah_jiwa');
 
-        // 3. Data Donut Chart Wisatawan 
-        $kategoriLokal = KategoriWisatawan::where('nama_kategori_wisatawan', 'like', '%Lokal%Bangka%')->pluck('id_kategori_wisatawan');
-        $kategoriNusantara = KategoriWisatawan::where('nama_kategori_wisatawan', 'like', '%Nusantara%')->pluck('id_kategori_wisatawan');
-        $kategoriMancanegara = KategoriWisatawan::where('nama_kategori_wisatawan', 'like', '%Mancanegara%')->pluck('id_kategori_wisatawan');
+        // 3. Data Donut Chart Wisatawan (Dibuat lebih fleksibel pencariannya)
+        $kategoriLokal = KategoriWisatawan::where('nama_kategori_wisatawan', 'like', '%lokal%')->pluck('id_kategori_wisatawan');
+        $kategoriNusantara = KategoriWisatawan::where('nama_kategori_wisatawan', 'like', '%nusantara%')->pluck('id_kategori_wisatawan');
+        $kategoriMancanegara = KategoriWisatawan::where('nama_kategori_wisatawan', 'like', '%mancanegara%')
+            ->orWhere('nama_kategori_wisatawan', 'like', '%asing%')
+            ->pluck('id_kategori_wisatawan');
 
         $wisatawanLokal = DetailWisatawanTransaksi::whereIn('id_transaksi', $transaksiIds)
-            ->whereIn('id_kategori_wisatawan', $kategoriLokal)->count();
+            ->whereIn('id_kategori_wisatawan', $kategoriLokal)->sum('jumlah_jiwa');
 
         $wisatawanNusantara = DetailWisatawanTransaksi::whereIn('id_transaksi', $transaksiIds)
-            ->whereIn('id_kategori_wisatawan', $kategoriNusantara)->count();
+            ->whereIn('id_kategori_wisatawan', $kategoriNusantara)->sum('jumlah_jiwa');
 
         $wisatawanMancanegara = DetailWisatawanTransaksi::whereIn('id_transaksi', $transaksiIds)
-            ->whereIn('id_kategori_wisatawan', $kategoriMancanegara)->count();
+            ->whereIn('id_kategori_wisatawan', $kategoriMancanegara)->sum('jumlah_jiwa');
 
         // 4. Data Donut Chart Kendaraan 
-        $kendaraanMotor = (clone $transaksiQuery)->where('id_tarif', 1)->count(); 
-        $kendaraanMobil = (clone $transaksiQuery)->where('id_tarif', 2)->count();
+        // Menggunakan relasi atau id_tarif yang dinamis
+        $kendaraanMotor = (clone $transaksiQuery)->whereHas('tarif.kendaraan', function($q) {
+            $q->where('nama_kendaraan', 'LIKE', '%motor%');
+        })->count(); 
+
+        $kendaraanMobil = (clone $transaksiQuery)->whereHas('tarif.kendaraan', function($q) {
+            $q->where('nama_kendaraan', 'LIKE', '%mobil%');
+        })->count();
 
         // 5. Data Line Chart Tren Kunjungan (Dinamis Berdasarkan Filter)
         $trenKunjungan = [];
@@ -164,7 +171,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Method index (Struktur aslinya dijaga tetap utuh)
+     * Method index
      */
     public function index(Request $request)
     {
@@ -173,7 +180,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Method exportExcel menggunakan data dari sumber yang sama tanpa duplikasi kode
+     * Method exportExcel
      */
     public function exportExcel(Request $request)
     {
