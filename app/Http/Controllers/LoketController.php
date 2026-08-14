@@ -131,17 +131,22 @@ class LoketController extends Controller
 
             DB::commit();
 
-            if ($request->metode_cetak === 'e-ticket') {
-                // Jika pilih e-ticket, arahkan URL-nya ke halaman khusus QR Code
-                $urlTujuan = route('transaksi.qrcode', $transaksi->id_transaksi);
-            } else {
-                // Jika pilih print biasa, arahkan ke URL cetak kertas thermal
-                $urlTujuan = route('transaksi.cetak', $transaksi->id_transaksi);
-            }
+            // if ($request->metode_cetak === 'e-ticket') {
+            //     // Jika pilih e-ticket, arahkan URL-nya ke halaman khusus QR Code
+            //     $urlTujuan = route('transaksi.qrcode', $transaksi->id_transaksi);
+            // } else {
+            //     // Jika pilih print biasa, arahkan ke URL cetak kertas thermal
+            //     $urlTujuan = route('transaksi.cetak', $transaksi->id_transaksi);
+            // }
+
+            // return response()->json([
+            //     'status'    => 'sukses',
+            //     'url_print' => $urlTujuan
+            // ]);
 
             return response()->json([
-                'status'    => 'sukses',
-                'url_print' => $urlTujuan
+            'status' => 'sukses',
+            'url_print' => route('transaksi.cetak', $transaksi->id_transaksi)
             ]);
 
         } catch (\Exception $e) {
@@ -194,14 +199,14 @@ class LoketController extends Controller
         return view('transaksi.cetak-struk', compact('transaksi'));
     }
 
-    public function qrcode($id)
-    {
-        $transaksi = Transaksi::with(['tarif.kendaraan', 'user'])->where('id_transaksi', $id)->first();
+    // public function qrcode($id)
+    // {
+    //     $transaksi = Transaksi::with(['tarif.kendaraan', 'user'])->where('id_transaksi', $id)->first();
 
-        if (!$transaksi) {
-            abort(404, 'Data transaksi tidak ditemukan.');
-        }
+    //     if (!$transaksi) {
+    //         abort(404, 'Data transaksi tidak ditemukan.');
+    //     }
 
-        return view('transaksi.qr-tiket', compact('transaksi'));
-    }
+    //     return view('transaksi.qr-tiket', compact('transaksi'));
+    // }
 }
