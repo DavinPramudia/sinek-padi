@@ -14,7 +14,7 @@
 </head>
 
 <body class="bg-[#0B0909] text-[#ededed] font-sans antialiased">
-    <x-header-petugas></x-header-petugas>
+    <x-petugas.header-petugas></x-petugas.header-petugas>
 
     <main class="max-w-7xl mx-auto px-4 py-5 space-y-6">
         {{ $slot }}

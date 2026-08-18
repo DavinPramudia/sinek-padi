@@ -104,7 +104,9 @@ class LoketController extends Controller
         try {
             DB::beginTransaction();
 
-            $noKarcis = 'TRX-' . date('Ymd') . '-' . strtoupper(Str::random(5));
+            do {
+                $noKarcis = 'TRX-' . now()->format('Ymd') . '-' . strtoupper(Str::random(5));
+            } while (Transaksi::where('no_karcis', $noKarcis)->exists());
 
             // Menggunakan Eloquent Model create()
             $transaksi = Transaksi::create([
