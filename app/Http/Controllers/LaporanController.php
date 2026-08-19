@@ -60,6 +60,10 @@ class LaporanController extends Controller
      */
     public function index(Request $request)
     {
+        if ($request->has('search') && trim($request->input('search')) === '') {
+            $request->request->remove('search');
+        }
+
         $filterType = $request->input('filter_type', 'harian');
         $search = $request->input('search');
 
@@ -137,6 +141,11 @@ class LaporanController extends Controller
      */
     public function exportExcel(Request $request)
     {
+        //ini
+        if ($request->has('search') && trim($request->input('search')) === '') {
+            $request->request->remove('search');
+        }
+        
         $filterType = $request->input('filter_type', 'harian');
         $transaksiQuery = $this->getQueryFilter($request);
         $transaksi = $transaksiQuery->latest('waktu')->get();

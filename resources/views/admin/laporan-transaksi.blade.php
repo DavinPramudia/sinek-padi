@@ -24,12 +24,24 @@
                 <input type="hidden" name="triwulan" value="{{ request('triwulan') }}">
                 <input type="hidden" name="tahun_triwulan" value="{{ request('tahun_triwulan') }}">
 
+                <!-- Input Text Search (Padding kanan dilebarkan agar muat ikon X dan ikon Search) -->
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari No. Tiket..." class="w-full bg-[#141c1a] border border-[#243733] text-[#EDEDED] text-xs rounded-xl pl-4 pr-16 py-2 focus:outline-none">
+
+                <!-- TOMBOL HAPUS / IKON SILANG (Muncul otomatis jika search ada isinya) -->
+                @if(request()->filled('search'))
+                    <a href="{{ route('admin.laporan-transaksi', request()->except('search')) }}" 
+                       class="absolute inset-y-0 right-8 flex items-center pr-1 text-[#d1d5dc] hover:text-red-400 transition" 
+                       title="Hapus Pencarian">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                    </a>
+                @endif
+
                 <!-- Ikon Search di Kanan -->
                 <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-[#d1d5dc]">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
                 </span>
-
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari No. Tiket..." class="w-full bg-[#141c1a] border border-[#243733] text-[#EDEDED] text-xs rounded-xl pl-4 pr-9 py-2 focus:outline-none">
             </form>
 
             <a href="{{ route('admin.laporan.export', request()->all()) }}" class="bg-[#141c1a] border border-[#243733] text-[#EDEDED] hover:bg-[#243733] text-xs font-semibold px-4 py-2 rounded-xl transition flex items-center space-x-2">
@@ -73,7 +85,7 @@
                             <tr class="hover:bg-[#1c2b28] transition">
                                 <td class="p-3.5 font-medium text-white">{{ $item->no_karcis ?? $item->no_tiket }}</td>
                                 <td class="p-3.5">{{ \Carbon\Carbon::parse($item->waktu)->format('H:i') }}</td>
-                                <td class="p-3.5">{{ $item->kategori_kendaraan ?? 'Mobil/Motor' }}</td>
+                                <td class="p-3.5">{{ optional($item->tarif->kendaraan)->nama_kendaraan ?? '-' }}</td>                                
                                 
                                 <!-- Kolom Sensus di Tengah dengan Format L / N / M -->
                                 <td class="p-3.5 text-center font-medium tracking-wider">
