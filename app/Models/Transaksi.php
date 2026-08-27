@@ -44,4 +44,40 @@ class Transaksi extends Model
         }
         return "{$lokal} / {$nusantara} / {$mancanegara}";
     }
+    public function scopeFilter($query, $request)
+    {
+        $filterType = $request->input('filter_type', 'harian');
+        
+        if ($filterType == 'harian') {
+            $tanggalPilihan = $request->input('tanggal', date('Y-m-d'));
+            $query->whereDate('waktu', $tanggalPilihan);
+        } 
+        elseif ($filterType == 'bulanan' && $request->filled('bulan')) {
+            $tahunBulan = explode('-', $request->bulan);
+            $query->whereYear('waktu', $tahunBulan[0])
+                  ->whereMonth('waktu', $tahunBulan[1]);
+        } 
+        elseif ($filterType == 'tahunan' && $request->filled('tahun')) {
+            $query->whereYear('waktu', $request->tahun);
+        } 
+        elseif ($filterType == 'triwulanan') {
+            $tahun = $request->input('tahun_triwulan', date('Y'));
+            $triwulan = $request->input('triwulan', 1);
+
+            $bulanMulai = (($triwulan - 1) * 3) + 1;
+            $bulanSelesai = $bulanMulai + 2;
+
+            $query->whereYear('waktu', $tahun)
+                  ->whereMonth('waktu', '>=', $bulanMulai)
+                  ->whereMonth('waktu', '<=', $bulanSelesai);
+        } else {
+            $query->whereDate('waktu', today());
+        }
+
+        if ($request->filled('search')) {
+            $query->where('no_karcis', 'like', "%{$request->input('search')}%");
+        }
+
+        return $query;
+    }
 }

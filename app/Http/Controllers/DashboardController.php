@@ -13,34 +13,9 @@ class DashboardController extends Controller
     private function getDashboardData(Request $request)
     {
         $filterType = $request->input('filter_type', 'harian');
-        $transaksiQuery = Transaksi::with(['details.kategoriWisatawan', 'tarif.kendaraan']);
 
-        // 1. Logika Penyaringan Berdasarkan Filter di Header
-        if ($filterType == 'harian') {
-            $tanggalPilihan = $request->input('tanggal', date('Y-m-d'));
-            $transaksiQuery->whereDate('waktu', $tanggalPilihan);
-        } 
-        elseif ($filterType == 'bulanan' && $request->filled('bulan')) {
-            $tahunBulan = explode('-', $request->bulan);
-            $transaksiQuery->whereYear('waktu', $tahunBulan[0])
-                           ->whereMonth('waktu', $tahunBulan[1]);
-        } 
-        elseif ($filterType == 'tahunan' && $request->filled('tahun')) {
-            $transaksiQuery->whereYear('waktu', $request->tahun);
-        } 
-        elseif ($filterType == 'triwulanan') {
-            $tahun = $request->input('tahun_triwulan', date('Y'));
-            $triwulan = $request->input('triwulan', 1);
-
-            $bulanMulai = (($triwulan - 1) * 3) + 1;
-            $bulanSelesai = $bulanMulai + 2;
-
-            $transaksiQuery->whereYear('waktu', $tahun)
-                           ->whereMonth('waktu', '>=', $bulanMulai)
-                           ->whereMonth('waktu', '<=', $bulanSelesai);
-        } else {
-            $transaksiQuery->whereDate('waktu', today());
-        }
+        $transaksiQuery = Transaksi::with(['details.kategoriWisatawan', 'tarif.kendaraan'])
+                                   ->filter($request);
 
         // Ambil semua data transaksi yang sesuai filter
         $transaksiList = $transaksiQuery->get();
@@ -49,7 +24,7 @@ class DashboardController extends Controller
         $totalPendapatan = $transaksiList->sum('total_bayar');
         $totalKendaraan = $transaksiList->count();
 
-        // 3. Menghitung Sensus Wisatawan & Kendaraan Menggunakan Data Collection (Bersih dari query manual!)
+        // 3. Menghitung Sensus Wisatawan & Kendaraan Menggunakan Data Collection
         $totalWisatawan = 0;
         $wisatawanLokal = 0;
         $wisatawanNusantara = 0;
@@ -59,7 +34,6 @@ class DashboardController extends Controller
         $kendaraanMobil = 0;
 
         foreach ($transaksiList as $item) {
-            // Memecah string sensus yang otomatis dihitung oleh Model Transaksi
             $sensusParts = explode(' / ', $item->sensus_rangkuman ?? '0 / 0 / 0');
             $l = (int) ($sensusParts[0] ?? 0);
             $n = (int) ($sensusParts[1] ?? 0);
@@ -70,7 +44,6 @@ class DashboardController extends Controller
             $wisatawanMancanegara += $m;
             $totalWisatawan += ($l + $n + $m);
 
-            // Cek kategori kendaraan dari relasi tarif
             $namaKendaraan = strtolower(optional($item->tarif->kendaraan)->nama_kendaraan ?? '');
             if (str_contains($namaKendaraan, 'motor')) {
                 $kendaraanMotor++;
@@ -82,7 +55,7 @@ class DashboardController extends Controller
         // 5. Data Tren Kunjungan & Rincian Bulanan (Khusus Tahunan)
         $trenKunjungan = [];
         $labelsGrafik = [];
-        $rincianBulanan = []; // <-- Tambahan array untuk rincian tabel export tahunan
+        $rincianBulanan = [];
 
         if ($filterType == 'bulanan' && $request->filled('bulan')) {
             $tahunBulan = explode('-', $request->bulan);
@@ -105,21 +78,15 @@ class DashboardController extends Controller
                 $totalPendapatanBulan = $transaksiBulanList->sum('total_bayar');
                 $jumlahTransaksi = $transaksiBulanList->count();
 
-                // Hitung sensus wisatawan & jenis kendaraan per bulan
-                $lokalBulan = 0;
-                $nusantaraBulan = 0;
-                $mancanegaraBulan = 0;
-                $motorBulan = 0;
-                $mobilBulan = 0;
+                $lokalBulan = 0; $nusantaraBulan = 0; $mancanegaraBulan = 0;
+                $motorBulan = 0; $mobilBulan = 0;
 
                 foreach ($transaksiBulanList as $item) {
-                    // Sensus Wisatawan
                     $sensusParts = explode(' / ', $item->sensus_rangkuman ?? '0 / 0 / 0');
                     $lokalBulan += (int) ($sensusParts[0] ?? 0);
                     $nusantaraBulan += (int) ($sensusParts[1] ?? 0);
                     $mancanegaraBulan += (int) ($sensusParts[2] ?? 0);
 
-                    // Kategori Kendaraan
                     $namaKendaraan = strtolower(optional($item->tarif->kendaraan)->nama_kendaraan ?? '');
                     if (str_contains($namaKendaraan, 'motor')) {
                         $motorBulan++;
@@ -133,7 +100,6 @@ class DashboardController extends Controller
                 $trenKunjungan[] = $jumlahTransaksi;
                 $labelsGrafik[] = $namaBulan;
 
-                // Simpan rincian lengkap termasuk motor & mobil
                 $rincianBulanan[] = [
                     'bulan' => $namaBulan,
                     'motor' => $motorBulan,
@@ -144,7 +110,7 @@ class DashboardController extends Controller
                     'pendapatan' => $totalPendapatanBulan
                 ];
             }
-        }
+        } 
         elseif ($filterType == 'triwulanan') {
             $tahun = $request->input('tahun_triwulan', date('Y'));
             $triwulan = $request->input('triwulan', 1);
@@ -168,7 +134,7 @@ class DashboardController extends Controller
             }
         }
 
-        // 6. Label Periode Teks Singkat & Satuan Grafik
+        // 6. Label Periode & Konfigurasi Chart
         $labelPeriode = match ($filterType) {
             'bulanan' => $request->filled('bulan') ? Carbon::createFromFormat('Y-m', $request->bulan)->translatedFormat('F Y') : 'Bulan Ini',
             'tahunan' => 'Tahun ' . $request->input('tahun', date('Y')),
@@ -220,6 +186,17 @@ class DashboardController extends Controller
     public function exportExcel(Request $request)
     {
         $data = $this->getDashboardData($request);
-        return Excel::download(new DashboardExport($data), 'Rekap-Dashboard-SINEK-PADI.xlsx');
+        $filterType = $request->input('filter_type', 'harian');
+
+        $namaFilePeriode = match ($filterType) {
+            'bulanan'    => 'Bulan-' . ($request->input('bulan') ?: date('Y-m')),
+            'tahunan'    => 'Tahun-' . $request->input('tahun', date('Y')),
+            'triwulanan' => 'Triwulan-' . $request->input('triwulan', 1) . '-' . $request->input('tahun_triwulan', date('Y')),
+            default      => 'Tanggal-' . $request->input('tanggal', date('Y-m-d')),
+        };
+
+        $namaFile = "Rekap-Dashboard-SINEK-PADI-{$namaFilePeriode}.xlsx";
+
+        return Excel::download(new DashboardExport($data), $namaFile);
     }
 }

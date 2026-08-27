@@ -87,7 +87,6 @@ class LaporanTransaksiExport implements FromCollection, WithHeadings, WithStyles
 
     public function styles(Worksheet $sheet)
     {
-        // Memastikan kolom E sampai H format angkanya aman
         $sheet->getStyle('E3:H5000')->getNumberFormat()->setFormatCode('#,##0');
 
         return [

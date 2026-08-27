@@ -61,7 +61,6 @@ class DashboardExport implements FromArray, WithStyles, WithEvents
                 ];
             }
         } else {
-            // Jika bukan tahunan, tampilkan tren biasa
             $rows[] = ['-- TREN KUNJUNGAN (' . strtoupper($this->data['satuanWaktu']) . ') --', 'Jumlah Pengunjung', '', '', '', '', ''];
             foreach ($this->data['labelsGrafik'] as $index => $label) {
                 $jumlah = $this->data['trenKunjungan'][$index] ?? 0;
@@ -90,7 +89,6 @@ class DashboardExport implements FromArray, WithStyles, WithEvents
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
                 
-                // Otomatis sesuaikan lebar kolom A sampai G
                 foreach (['A', 'B', 'C', 'D', 'E', 'F', 'G'] as $column) {
                     $sheet->getColumnDimension($column)->setAutoSize(true);
                 }
