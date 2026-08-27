@@ -10,12 +10,25 @@
 
         {{-- Filter & Tombol Tambah Petugas --}}
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            {{-- Search Bar dengan Tombol Kacamata di Kanan --}}
+            
+            {{-- Search Bar dengan Tombol Silang (X) & Kacamata --}}
             <form action="{{ route('admin.manajemen-akun') }}" method="GET" class="relative w-full sm:w-72">
-                {{-- Input Search (padding kanan ditambah pr-10 agar teks tidak menabrak ikon) --}}
-                <input type="text" name="search" value="{{ request('search') }}" class="bg-[#141c1a] border border-[#243733] text-[#EDEDED] text-xs rounded-lg focus:ring-[#3aafa9] focus:border-[#3aafa9] block w-full pl-4 pr-10 p-2.5 placeholder-[#d1d5dc]/60 outline-none transition" placeholder="Cari username / nama...">
                 
-                {{-- Tombol Ikon Kacamata di Kanan (Bisa diklik atau tekan Enter) --}}
+                {{-- Input Text Search (Padding kanan dilebarkan agar muat ikon X dan ikon Search) --}}
+                <input type="text" name="search" value="{{ request('search') }}" class="bg-[#141c1a] border border-[#243733] text-[#EDEDED] text-xs rounded-lg focus:ring-[#3aafa9] focus:border-[#3aafa9] block w-full pl-4 pr-16 p-2.5 placeholder-[#d1d5dc]/60 outline-none transition" placeholder="Cari username / nama...">
+                
+                {{-- TOMBOL HAPUS / IKON SILANG (Muncul otomatis jika search ada isinya) --}}
+                @if(request()->filled('search'))
+                    <a href="{{ route('admin.manajemen-akun') }}" 
+                       class="absolute inset-y-0 right-8 flex items-center pr-1 text-[#d1d5dc] hover:text-red-400 transition" 
+                       title="Hapus Pencarian">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                    </a>
+                @endif
+
+                {{-- Tombol Ikon Kacamata di Kanan Paling Ujung --}}
                 <button type="submit" class="absolute inset-y-0 right-0 flex items-center pr-3 text-[#d1d5dc] hover:text-[#EDEDED] transition cursor-pointer" title="Cari">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />

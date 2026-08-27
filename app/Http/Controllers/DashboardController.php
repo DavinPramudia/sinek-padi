@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\KategoriWisatawan;
 use Illuminate\Http\Request;
 use App\Models\Transaksi;
-use App\Models\DetailWisatawanTransaksi;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\DashboardExport;
@@ -15,7 +13,7 @@ class DashboardController extends Controller
     private function getDashboardData(Request $request)
     {
         $filterType = $request->input('filter_type', 'harian');
-        $transaksiQuery = Transaksi::query();
+        $transaksiQuery = Transaksi::with(['details.kategoriWisatawan', 'tarif.kendaraan']);
 
         // 1. Logika Penyaringan Berdasarkan Filter di Header
         if ($filterType == 'harian') {
@@ -44,43 +42,44 @@ class DashboardController extends Controller
             $transaksiQuery->whereDate('waktu', today());
         }
 
-        // 2. Data Statistik Atas (Mengikuti Filter)
-        $totalPendapatan = (clone $transaksiQuery)->sum('total_bayar');
-        $totalKendaraan = (clone $transaksiQuery)->count();
+        // Ambil semua data transaksi yang sesuai filter
+        $transaksiList = $transaksiQuery->get();
 
-        // Ambil ID transaksi yang lolos filter untuk menghitung detail wisatawan
-        $transaksiIds = (clone $transaksiQuery)->pluck('id_transaksi');
-        
-        // Perbaikan: Menggunakan sum('jumlah_jiwa') alih-alih count() agar menghitung jumlah orang, bukan jumlah baris transaksi
-        $totalWisatawan = DetailWisatawanTransaksi::whereIn('id_transaksi', $transaksiIds)->sum('jumlah_jiwa');
+        // 2. Data Statistik Atas
+        $totalPendapatan = $transaksiList->sum('total_bayar');
+        $totalKendaraan = $transaksiList->count();
 
-        // 3. Data Donut Chart Wisatawan (Dibuat lebih fleksibel pencariannya)
-        $kategoriLokal = KategoriWisatawan::where('nama_kategori_wisatawan', 'like', '%lokal%')->pluck('id_kategori_wisatawan');
-        $kategoriNusantara = KategoriWisatawan::where('nama_kategori_wisatawan', 'like', '%nusantara%')->pluck('id_kategori_wisatawan');
-        $kategoriMancanegara = KategoriWisatawan::where('nama_kategori_wisatawan', 'like', '%mancanegara%')
-            ->orWhere('nama_kategori_wisatawan', 'like', '%asing%')
-            ->pluck('id_kategori_wisatawan');
+        // 3. Menghitung Sensus Wisatawan & Kendaraan Menggunakan Data Collection (Bersih dari query manual!)
+        $totalWisatawan = 0;
+        $wisatawanLokal = 0;
+        $wisatawanNusantara = 0;
+        $wisatawanMancanegara = 0;
 
-        $wisatawanLokal = DetailWisatawanTransaksi::whereIn('id_transaksi', $transaksiIds)
-            ->whereIn('id_kategori_wisatawan', $kategoriLokal)->sum('jumlah_jiwa');
+        $kendaraanMotor = 0;
+        $kendaraanMobil = 0;
 
-        $wisatawanNusantara = DetailWisatawanTransaksi::whereIn('id_transaksi', $transaksiIds)
-            ->whereIn('id_kategori_wisatawan', $kategoriNusantara)->sum('jumlah_jiwa');
+        foreach ($transaksiList as $item) {
+            // Memecah string sensus yang otomatis dihitung oleh Model Transaksi
+            $sensusParts = explode(' / ', $item->sensus_rangkuman ?? '0 / 0 / 0');
+            $l = (int) ($sensusParts[0] ?? 0);
+            $n = (int) ($sensusParts[1] ?? 0);
+            $m = (int) ($sensusParts[2] ?? 0);
 
-        $wisatawanMancanegara = DetailWisatawanTransaksi::whereIn('id_transaksi', $transaksiIds)
-            ->whereIn('id_kategori_wisatawan', $kategoriMancanegara)->sum('jumlah_jiwa');
+            $wisatawanLokal += $l;
+            $wisatawanNusantara += $n;
+            $wisatawanMancanegara += $m;
+            $totalWisatawan += ($l + $n + $m);
 
-        // 4. Data Donut Chart Kendaraan 
-        // Menggunakan relasi atau id_tarif yang dinamis
-        $kendaraanMotor = (clone $transaksiQuery)->whereHas('tarif.kendaraan', function($q) {
-            $q->where('nama_kendaraan', 'LIKE', '%motor%');
-        })->count(); 
+            // Cek kategori kendaraan dari relasi tarif
+            $namaKendaraan = strtolower(optional($item->tarif->kendaraan)->nama_kendaraan ?? '');
+            if (str_contains($namaKendaraan, 'motor')) {
+                $kendaraanMotor++;
+            } elseif (str_contains($namaKendaraan, 'mobil')) {
+                $kendaraanMobil++;
+            }
+        }
 
-        $kendaraanMobil = (clone $transaksiQuery)->whereHas('tarif.kendaraan', function($q) {
-            $q->where('nama_kendaraan', 'LIKE', '%mobil%');
-        })->count();
-
-        // 5. Data Line Chart Tren Kunjungan (Dinamis Berdasarkan Filter)
+        // 5. Data Line Chart Tren Kunjungan
         $trenKunjungan = [];
         $labelsGrafik = [];
 
@@ -170,18 +169,12 @@ class DashboardController extends Controller
         );
     }
 
-    /**
-     * Method index
-     */
     public function index(Request $request)
     {
         $data = $this->getDashboardData($request);
         return view('admin.dashboard', $data);
     }
 
-    /**
-     * Method exportExcel
-     */
     public function exportExcel(Request $request)
     {
         $data = $this->getDashboardData($request);
