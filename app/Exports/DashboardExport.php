@@ -25,32 +25,48 @@ class DashboardExport implements FromArray, WithStyles, WithEvents
             [''], 
             
             // 1. Ringkasan Utama
-            ['-- RINGKASAN UTAMA --', ''],
-            ['Total Pendapatan', 'Rp ' . number_format($this->data['totalPendapatan'], 0, ',', '.')],
-            ['Total Kendaraan', $this->data['totalKendaraan'] . ' Unit'],
-            ['Total Wisatawan', $this->data['totalWisatawan'] . ' Orang'],
+            ['-- RINGKASAN UTAMA --', '', '', '', '', '', ''],
+            ['Total Pendapatan', 'Rp ' . number_format($this->data['totalPendapatan'], 0, ',', '.'), '', '', '', '', ''],
+            ['Total Kendaraan', $this->data['totalKendaraan'] . ' Unit', '', '', '', '', ''],
+            ['Total Wisatawan', $this->data['totalWisatawan'] . ' Orang', '', '', '', '', ''],
             [''],
 
             // 2. Sensus Wisatawan
-            ['-- DETAIL SENSUS WISATAWAN --', ''],
-            ['Wisatawan Lokal', $this->data['wisatawanLokal'] . ' Orang'],
-            ['Wisatawan Nusantara', $this->data['wisatawanNusantara'] . ' Orang'],
-            ['Wisatawan Mancanegara', $this->data['wisatawanMancanegara'] . ' Orang'],
+            ['-- DETAIL SENSUS WISATAWAN --', '', '', '', '', '', ''],
+            ['Wisatawan Lokal', $this->data['wisatawanLokal'] . ' Orang', '', '', '', '', ''],
+            ['Wisatawan Nusantara', $this->data['wisatawanNusantara'] . ' Orang', '', '', '', '', ''],
+            ['Wisatawan Mancanegara', $this->data['wisatawanMancanegara'] . ' Orang', '', '', '', '', ''],
             [''],
 
             // 3. Kategori Kendaraan
-            ['-- KATEGORI KENDARAAN --', ''],
-            ['Motor', $this->data['kendaraanMotor'] . ' Unit'],
-            ['Mobil', $this->data['kendaraanMobil'] . ' Unit'],
+            ['-- KATEGORI KENDARAAN --', '', '', '', '', '', ''],
+            ['Motor', $this->data['kendaraanMotor'] . ' Unit', '', '', '', '', ''],
+            ['Mobil', $this->data['kendaraanMobil'] . ' Unit', '', '', '', '', ''],
             [''],
-
-            // 4. Tabel Tren Kunjungan
-            ['-- TREN KUNJUNGAN (' . strtoupper($this->data['satuanWaktu']) . ') --', 'Jumlah Pengunjung'],
         ];
 
-        foreach ($this->data['labelsGrafik'] as $index => $label) {
-            $jumlah = $this->data['trenKunjungan'][$index] ?? 0;
-            $rows[] = [$label, $jumlah . ' Pengunjung'];
+        // 4. Jika filter tahunan, tampilkan tabel rincian lengkap per bulan (7 Kolom)
+        if (!empty($this->data['rincianBulanan'])) {
+            $rows[] = ['-- RINCIAN SENSUS & KENDARAAN PER BULAN --', 'Motor', 'Mobil', 'Lokal', 'Nusantara', 'Mancanegara', 'Total Pendapatan'];
+            
+            foreach ($this->data['rincianBulanan'] as $item) {
+                $rows[] = [
+                    $item['bulan'], 
+                    $item['motor'] . ' Unit', 
+                    $item['mobil'] . ' Unit', 
+                    $item['lokal'] . ' Orang', 
+                    $item['nusantara'] . ' Orang', 
+                    $item['mancanegara'] . ' Orang', 
+                    'Rp ' . number_format($item['pendapatan'], 0, ',', '.')
+                ];
+            }
+        } else {
+            // Jika bukan tahunan, tampilkan tren biasa
+            $rows[] = ['-- TREN KUNJUNGAN (' . strtoupper($this->data['satuanWaktu']) . ') --', 'Jumlah Pengunjung', '', '', '', '', ''];
+            foreach ($this->data['labelsGrafik'] as $index => $label) {
+                $jumlah = $this->data['trenKunjungan'][$index] ?? 0;
+                $rows[] = [$label, $jumlah . ' Pengunjung', '', '', '', '', ''];
+            }
         }
 
         return $rows;
@@ -60,7 +76,7 @@ class DashboardExport implements FromArray, WithStyles, WithEvents
     {
         return [
             1 => ['font' => ['bold' => true, 'size' => 14]], 
-            2 => ['font' => ['italic' => true]],             
+            2 => ['font' => ['italic' => true]],            
             4 => ['font' => ['bold' => true, 'color' => ['argb' => 'FFFFFF']], 'fill' => ['fillType' => 'solid', 'startColor' => ['argb' => '243733']]],
             9 => ['font' => ['bold' => true, 'color' => ['argb' => 'FFFFFF']], 'fill' => ['fillType' => 'solid', 'startColor' => ['argb' => '243733']]],
             14 => ['font' => ['bold' => true, 'color' => ['argb' => 'FFFFFF']], 'fill' => ['fillType' => 'solid', 'startColor' => ['argb' => '243733']]],
@@ -68,15 +84,14 @@ class DashboardExport implements FromArray, WithStyles, WithEvents
         ];
     }
 
-    // EVENT INI YANG MEMBUAT KOLOM OTOMATIS MENYESUAIKAN LEBARNYA (MENGGANTIKAN ALT+H+O+I)
     public function registerEvents(): array
     {
         return [
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
                 
-                // Otomatis sesuaikan lebar kolom A dan B berdasarkan panjang teks
-                foreach (['A', 'B'] as $column) {
+                // Otomatis sesuaikan lebar kolom A sampai G
+                foreach (['A', 'B', 'C', 'D', 'E', 'F', 'G'] as $column) {
                     $sheet->getColumnDimension($column)->setAutoSize(true);
                 }
             },

@@ -26,8 +26,6 @@ class Transaksi extends Model
     {
         return $this->hasMany(DetailWisatawanTransaksi::class, 'id_transaksi', 'id_transaksi');
     }
-
-    // Tambahkan di dalam class Transaksi
     public function getSensusRangkumanAttribute()
     {
         $lokal = 0; $nusantara = 0; $mancanegara = 0;

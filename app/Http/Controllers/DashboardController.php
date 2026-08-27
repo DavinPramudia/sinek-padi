@@ -79,9 +79,10 @@ class DashboardController extends Controller
             }
         }
 
-        // 5. Data Line Chart Tren Kunjungan
+        // 5. Data Tren Kunjungan & Rincian Bulanan (Khusus Tahunan)
         $trenKunjungan = [];
         $labelsGrafik = [];
+        $rincianBulanan = []; // <-- Tambahan array untuk rincian tabel export tahunan
 
         if ($filterType == 'bulanan' && $request->filled('bulan')) {
             $tahunBulan = explode('-', $request->bulan);
@@ -96,13 +97,54 @@ class DashboardController extends Controller
         } 
         elseif ($filterType == 'tahunan' && $request->filled('tahun')) {
             for ($bulan = 1; $bulan <= 12; $bulan++) {
-                $jumlah = (clone $transaksiQuery)->whereYear('waktu', $request->tahun)
-                                               ->whereMonth('waktu', $bulan)
-                                               ->count();
-                $trenKunjungan[] = $jumlah;
-                $labelsGrafik[] = Carbon::create(null, $bulan)->translatedFormat('M');
+                $queryBulan = (clone $transaksiQuery)->with(['details.kategoriWisatawan', 'tarif.kendaraan'])
+                                                     ->whereYear('waktu', $request->tahun)
+                                                     ->whereMonth('waktu', $bulan);
+                
+                $transaksiBulanList = $queryBulan->get();
+                $totalPendapatanBulan = $transaksiBulanList->sum('total_bayar');
+                $jumlahTransaksi = $transaksiBulanList->count();
+
+                // Hitung sensus wisatawan & jenis kendaraan per bulan
+                $lokalBulan = 0;
+                $nusantaraBulan = 0;
+                $mancanegaraBulan = 0;
+                $motorBulan = 0;
+                $mobilBulan = 0;
+
+                foreach ($transaksiBulanList as $item) {
+                    // Sensus Wisatawan
+                    $sensusParts = explode(' / ', $item->sensus_rangkuman ?? '0 / 0 / 0');
+                    $lokalBulan += (int) ($sensusParts[0] ?? 0);
+                    $nusantaraBulan += (int) ($sensusParts[1] ?? 0);
+                    $mancanegaraBulan += (int) ($sensusParts[2] ?? 0);
+
+                    // Kategori Kendaraan
+                    $namaKendaraan = strtolower(optional($item->tarif->kendaraan)->nama_kendaraan ?? '');
+                    if (str_contains($namaKendaraan, 'motor')) {
+                        $motorBulan++;
+                    } elseif (str_contains($namaKendaraan, 'mobil')) {
+                        $mobilBulan++;
+                    }
+                }
+                
+                $namaBulan = Carbon::create(null, $bulan)->translatedFormat('F');
+                
+                $trenKunjungan[] = $jumlahTransaksi;
+                $labelsGrafik[] = $namaBulan;
+
+                // Simpan rincian lengkap termasuk motor & mobil
+                $rincianBulanan[] = [
+                    'bulan' => $namaBulan,
+                    'motor' => $motorBulan,
+                    'mobil' => $mobilBulan,
+                    'lokal' => $lokalBulan,
+                    'nusantara' => $nusantaraBulan,
+                    'mancanegara' => $mancanegaraBulan,
+                    'pendapatan' => $totalPendapatanBulan
+                ];
             }
-        } 
+        }
         elseif ($filterType == 'triwulanan') {
             $tahun = $request->input('tahun_triwulan', date('Y'));
             $triwulan = $request->input('triwulan', 1);
@@ -165,7 +207,7 @@ class DashboardController extends Controller
             'totalPendapatan', 'totalKendaraan', 'totalWisatawan',
             'wisatawanLokal', 'wisatawanNusantara', 'wisatawanMancanegara',
             'kendaraanMotor', 'kendaraanMobil', 'trenKunjungan', 'labelsGrafik', 
-            'labelPeriode', 'satuanWaktu', 'chartConfig'
+            'labelPeriode', 'satuanWaktu', 'chartConfig', 'rincianBulanan'
         );
     }
 
