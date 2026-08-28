@@ -96,4 +96,44 @@ class AdminController extends Controller
 
         return redirect()->route('admin.manajemen-akun')->with('success', 'Akun berhasil dihapus!');
     }
+
+    // 6. Tampilkan Halaman Profil Petugas
+    public function profileEdit()
+    {
+        $user = auth()->user();
+        return view('petugas.profile.edit', compact('user'));
+    }
+
+    // 7. Update Profil (Nama & Password jadi satu)
+    public function profileUpdate(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $user->name = $request->name;
+
+        if ($request->filled('current_password') || $request->filled('password')) {
+            $request->validate([
+                'current_password' => ['required', function ($attribute, $value, $fail) use ($user) {
+                    if (!Hash::check($value, $user->password)) {
+                        $fail('Password lama yang kamu masukkan salah.');
+                    }
+                }],
+                'password' => 'required|string|min:6|confirmed',
+            ], [
+                'current_password.required' => 'Password lama wajib diisi jika ingin mengganti password.',
+                'password.confirmed' => 'Konfirmasi password baru tidak cocok.',
+                'password.min' => 'Password baru minimal harus 6 karakter.',
+            ]);
+
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
+
+        return back()->with('success', 'Profil berhasil diperbarui!');
+    }
 }

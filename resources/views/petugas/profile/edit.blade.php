@@ -52,6 +52,7 @@
                 @error('current_password') <span class="text-xs text-red-400 mt-1 block">{{ $message }}</span> @enderror
             </div>
 
+            {{-- PASSWORD BARU --}}
             <div x-data="{ showPassword: false }">
                 <label class="block text-xs font-medium text-[#EDEDED] mb-2">Password Baru <span class="text-gray-500 font-normal">(Kosongkan jika tidak ingin mengubah)</span></label>
                 <div class="relative">
@@ -73,6 +74,7 @@
                 @error('password') <span class="text-xs text-red-400 mt-1 block">{{ $message }}</span> @enderror
             </div>
 
+            {{-- KONFIRMASI PASSWORD BARU --}}
             <div x-data="{ showConfirmPassword: false }">
                 <label class="block text-xs font-medium text-[#EDEDED] mb-2">Ulangi Password Baru</label>
                 <div class="relative">

@@ -57,4 +57,8 @@ Route::middleware(['auth'])->group(function () {
     // 7. Halaman Pengaturan Admin
     Route::get('/admin/pengaturan', [PengaturanController::class, 'index'])->name('admin.pengaturan');
     Route::put('/admin/pengaturan/{id}', [PengaturanController::class, 'update'])->name('admin.pengaturan.update');
+
+    // 8. Halaman Profil & Ganti Password (Dihandle oleh AdminController)
+    Route::get('/profile', [AdminController::class, 'profileEdit'])->name('profile.edit');
+    Route::put('/profile/update', [AdminController::class, 'profileUpdate'])->name('profile.update');
 });
