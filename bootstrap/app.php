@@ -15,4 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
+        $exceptions->render(function (TokenMismatchException $e, $request) {
+            return redirect()->route('login')
+                ->with('error', 'Sesi Anda telah kedaluwarsa, silakan login kembali.');
+        });
     })->create();

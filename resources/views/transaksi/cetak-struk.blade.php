@@ -83,11 +83,14 @@
         <p style="font-size: 10px; margin: 2px 0;">Simpan karcis ini sebagai bukti sah.</p>
     </div>
 
-{{-- Tombol hanya akan muncul jika bukan mode e-ticket (PDF) --}}
+{{-- Tombol interaktif (Hanya muncul di layar, otomatis hilang saat dicetak) --}}
     @if(request('mode') !== 'e-ticket')
-    <div class="text-center no-print" style="margin-top: 20px; margin-bottom: 20mm;">
-        <button onclick="window.print()" style="padding: 6px 12px;">
-            Cetak Ulang Struk
+    <div class="text-center no-print" style="margin-top: 15px; margin-bottom: 20mm; display: flex; justify-content: center; gap: 8px;">
+        <button onclick="window.print()" style="padding: 6px 12px; cursor: pointer;">
+            Cetak Ulang
+        </button>
+        <button onclick="window.close()" style="padding: 6px 12px; cursor: pointer; background: #e74c3c; color: #fff; border: none; border-radius: 4px;">
+            Keluar / Tutup
         </button>
     </div>
     @endif
