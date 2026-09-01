@@ -11,12 +11,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        // Mengecualikan rute logout dari token CSRF agar tidak pernah 419 saat sesi habis
+        $middleware->validateCsrfTokens(except: [
+            'logout',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
-        $exceptions->render(function (TokenMismatchException $e, $request) {
-            return redirect()->route('login')
-                ->with('error', 'Sesi Anda telah kedaluwarsa, silakan login kembali.');
-        });
     })->create();

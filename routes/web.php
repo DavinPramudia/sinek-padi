@@ -13,14 +13,13 @@ Route::get('/', function () {
 });
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.process');
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1')->name('login.process');
+
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Route khusus yang harus login dulu (Middleware Auth)
 Route::middleware(['auth'])->group(function () {
-    
-    // Route Logout dipindah ke dalam group middleware auth
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    
+        
     // 1. Halaman Petugas Loket
     Route::get('/petugas/loket', [LoketController::class, 'index'])->name('petugas.loket');
 
