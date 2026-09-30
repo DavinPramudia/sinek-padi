@@ -1,10 +1,8 @@
 <aside class="w-64 bg-[#141c1a] border-r border-[#243733] flex flex-col justify-between p-5 shrink-0 h-full">
     <div class="space-y-8">
         <!-- Logo Sinek Padi -->
-        <div class="flex items-center space-x-3 px-2">
-            <div class="font-black text-2xl tracking-wider text-[#3aafa9] leading-none">
-                SINEK<br><span class="text-white text-xl">PADI</span>
-            </div>
+        <div class="flex justify-center items-center px-2 py-2">
+            <img src="/assets/images/logo-sinek-padi.png" alt="Logo Sinek Padi" class="h-20 w-auto object-contain" />
         </div>
 
         <!-- Menu Navigasi Sidebar -->
