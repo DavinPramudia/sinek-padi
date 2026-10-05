@@ -1,4 +1,3 @@
-{{-- resources/views/components/print-modal.blade.php --}}
 <div x-show="openPrintModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
     <div class="bg-gray-800 border border-gray-700 p-6 rounded-xl shadow-xl max-w-sm w-full text-center space-y-4">
         
@@ -22,14 +21,11 @@
                 </button>
             </div>
 
-            {{-- Wadah Tombol Bawah (Persis seperti modal logout) --}}
             <div class="flex justify-center space-x-3 pt-2">
-                {{-- Tombol Batal --}}
                 <button @click="openPrintModal = false" type="button" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded-lg transition cursor-pointer">
                     Batal
                 </button>
                 
-                {{-- Tombol Eksekusi (Simpan) --}}
                 <button @click="simpanDanCetak()" type="button" class="px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm rounded-lg transition cursor-pointer">
                     Simpan & Proses
                 </button>

@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use App\Models\Tarif;
+use App\Models\Kendaraan;
 use App\Models\KategoriWisatawan;
 use App\Models\Transaksi;
 use App\Models\DetailWisatawanTransaksi;
@@ -38,11 +39,21 @@ class LoketController extends Controller
         // 3. Total Tiket Terbit Hari Ini
         $totalTiket = Transaksi::whereDate('waktu', $tanggalHariIni)->count();
 
-        // 4. Hitung Motor menggunakan relasi Eloquent
-        $totalMotor = Transaksi::whereDate('waktu', $tanggalHariIni)
-            ->whereHas('tarif.kendaraan', function($q) {
-                $q->where('nama_kendaraan', 'LIKE', '%motor%');
-            })->count();
+        // 4. Hitung Kendaraan secara Dinamis dari Database
+        $listKendaraan = Kendaraan::all(); 
+        $statistikKendaraan = [];
+
+        foreach ($listKendaraan as $k) {
+            $jumlahTransaksi = Transaksi::whereDate('waktu', $tanggalHariIni)
+                ->whereHas('tarif.kendaraan', function($q) use ($k) {
+                    $q->where('nama_kendaraan', $k->nama_kendaraan);
+                })->count();
+
+            $statistikKendaraan[] = (object)[
+                'nama'  => $k->nama_kendaraan,
+                'total' => $jumlahTransaksi
+            ];
+        }
 
         // 5. Hitung Mobil menggunakan relasi Eloquent
         $totalMobil = Transaksi::whereDate('waktu', $tanggalHariIni)
@@ -92,8 +103,7 @@ class LoketController extends Controller
             'qtyMap',
             'totalPendapatan', 
             'totalTiket', 
-            'totalMotor', 
-            'totalMobil',
+            'statistikKendaraan', 
             'totalWisatawan',
             'riwayatTransaksi'
         ));
@@ -170,7 +180,6 @@ class LoketController extends Controller
             abort(404, 'Data transaksi tidak ditemukan.');
         }
 
-        // --- TAMBAHKAN LOGIKA REPRINT DI SINI ---
         // Jika URL membawa parameter ?reprint=true, maka tambah reprint_count +1
         if ($request->has('reprint') && $request->reprint == 'true') {
             $transaksi->increment('reprint_count');

@@ -1,13 +1,11 @@
 <nav class="bg-[#0B0909]/50 border-b border-[#EDEDED] py-1 px-6 flex justify-between items-center sticky top-0 z-50">
     {{-- Kiri --}}
     <div class="flex items-center space-x-0">
-        <span class="font-bold text-xl text-[#EDEDED]">Sinek Padi</span>
-        <span class="text-sm text-[#EDEDED] pl-4">Dinas Pariwisata Kota Pangkal Pinang</span>
+<img src="{{ asset('assets/images/logo-sinek-padi.png') }}" alt="Logo SINEK PADI" class="h-9 w-auto object-contain">        <span class="text-sm text-[#EDEDED] pl-4">Dinas Pariwisata Kota Pangkal Pinang</span>
     </div>
 
     {{-- Kanan --}}
     <div class="flex items-center space-x-4" x-data="{ openLogoutModal: false }">
-        {{-- Nama user otomatis dari session --}}
         <span class="text-sm text-[#EDEDED]">Halo, <strong class="text-[#3aafa9]">{{ Auth::user()->name }}</strong></span>
         
         <a href="{{ route('profile.edit') }}" class="w-8 h-8 flex items-center justify-center bg-transparent text-gray-400 hover:text-[#3aafa9] transition duration-150 cursor-pointer" title="Profil & Ganti Password">

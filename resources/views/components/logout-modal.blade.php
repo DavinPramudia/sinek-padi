@@ -6,7 +6,7 @@
         </p>
         
         <div class="flex justify-center space-x-3 pt-2">
-            {{-- Tombol Batal --}}
+
             <button @click="openLogoutModal = false" type="button" class="px-4 py-2 bg-[#243733] hover:bg-[#2E4540] text-[#d1d5dc] text-xs rounded-lg transition cursor-pointer">
                 Batal
             </button>

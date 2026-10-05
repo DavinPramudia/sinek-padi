@@ -12,8 +12,7 @@
         <x-petugas.card-ringkasan 
             :total-pendapatan="$totalPendapatan"
             :total-tiket="$totalTiket"
-            :total-motor="$totalMotor"
-            :total-mobil="$totalMobil"
+            :statistik-kendaraan="$statistikKendaraan"
             :total-wisatawan="$totalWisatawan"
         />
 

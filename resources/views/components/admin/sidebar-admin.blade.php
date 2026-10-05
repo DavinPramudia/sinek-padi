@@ -38,8 +38,14 @@
     <!-- Profil Admin di Bagian Bawah Sidebar -->
     <div class="border-t border-[#243733] pt-4 px-2">
         <div class="flex items-center space-x-3 text-xs text-[#d1d5dc]">
-            <div class="w-7 h-7 rounded-full bg-[#2E4540] flex items-center justify-center font-bold text-[#3aafa9]">A</div>
-            <span class="font-medium text-[#d1d5dc]">Admin Profile</span>
+            
+            <div class="w-7 h-7 rounded-full bg-[#2E4540] flex items-center justify-center font-bold text-[#3aafa9] shrink-0">
+                {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
+            </div>
+            
+            <div class="flex flex-col overflow-hidden">
+                <span class="font-medium text-white truncate">{{ auth()->user()->name ?? 'User' }}</span>
+            </div>
         </div>
     </div>
 </aside>

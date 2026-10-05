@@ -4,16 +4,15 @@
     <meta charset="UTF-8">
     <title>Struk Karcis - SINEK-PADI</title>
     <style>
-        /* Pengaturan mutlak untuk ukuran kertas thermal gulung */
         @page {
-            size: 58mm 85mm; /* Lebar 58mm, panjang otomatis dibatasi maksimal 200mm agar tidak kepanjangan */
+            size: 58mm 95mm; 
             margin: 2mm;
         }
 
         body {
             font-family: "Courier", "Courier New", monospace !important;            
             font-size: 11px;
-            width: 54mm; /* Dibuat sedikit di bawah 58mm agar ada sisa margin aman */
+            width: 54mm; 
             margin: 0 auto;
             padding: 2px;
             color: #000;
@@ -79,8 +78,8 @@
 
     <div class="border-dashed"></div>
     <div class="text-center" style="margin-top: 10px;">
-        <p style="margin: 2px 0;">Terima Kasih Atas Kunjungan Anda</p>
-        <p style="font-size: 10px; margin: 2px 0;">Simpan karcis ini sebagai bukti sah.</p>
+        <p style="font-size: 8px; margin: 2px 0;">Terima Kasih Atas Kunjungan Anda</p>
+        <p style="font-size: 8px; margin: 2px 0;">Simpan karcis ini sebagai bukti sah.</p>
     </div>
 
 {{-- Tombol interaktif (Hanya muncul di layar, otomatis hilang saat dicetak) --}}
@@ -94,6 +93,12 @@
         </button>
     </div>
     @endif
+
+    <script>
+        window.onafterprint = function() {
+            window.close();
+        };
+    </script>
 
 
 </body>

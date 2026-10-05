@@ -3,8 +3,11 @@
         
         <!-- TOMBOL KEMBALI -->
         <div>
-            <a href="{{ route('petugas.loket') }}" class="text-xs text-[#3aafa9] hover:underline flex items-center gap-1 font-medium">
-                &larr; Kembali ke Halaman Loket
+            <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#141c1a] border border-[#243733] hover:border-[#3aafa9] text-[#EDEDED] hover:text-[#3aafa9] text-xs font-medium rounded-xl transition-all duration-200 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Kembali ke Dashboard admin
             </a>
         </div>
 
