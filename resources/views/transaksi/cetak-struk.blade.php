@@ -25,20 +25,16 @@
         .flex-between { display: flex; justify-content: space-between; }
         .border-dashed { border-bottom: 1px dashed #000; margin: 6px 0; }
         
-        /* Saat dicetak, sembunyikan tombol dan pangkas lebar penuh */
         @media print {
             body { 
                 width: 54mm; 
                 margin: 0;
                 padding: 2mm;
             }
-            .no-print { 
-                display: none !important; 
-            }
         }
     </style>
 </head>
-<body onload="window.print()"> <!-- Otomatis membuka dialog print saat halaman terbuka -->
+<body onload="window.print()">
 
     <div class="text-center">
         <h3 class="font-bold" style="margin: 0; font-size: 16px;">SINEK-PADI</h3>
@@ -82,24 +78,11 @@
         <p style="font-size: 8px; margin: 2px 0;">Simpan karcis ini sebagai bukti sah.</p>
     </div>
 
-{{-- Tombol interaktif (Hanya muncul di layar, otomatis hilang saat dicetak) --}}
-    @if(request('mode') !== 'e-ticket')
-    <div class="text-center no-print" style="margin-top: 15px; margin-bottom: 20mm; display: flex; justify-content: center; gap: 8px;">
-        <button onclick="window.print()" style="padding: 6px 12px; cursor: pointer;">
-            Cetak Ulang
-        </button>
-        <button onclick="window.close()" style="padding: 6px 12px; cursor: pointer; background: #e74c3c; color: #fff; border: none; border-radius: 4px;">
-            Keluar / Tutup
-        </button>
-    </div>
-    @endif
-
     <script>
         window.onafterprint = function() {
             window.close();
         };
     </script>
-
 
 </body>
 </html>

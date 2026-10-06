@@ -41,14 +41,27 @@
                         </td>
                         <td class="py-3.5 font-bold text-[#3aafa9] text-sm">Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }}</td>
                         <td class="py-3.5 text-center">
-                            {{-- Tombol print ulang langsung membuka route cetak berdasarkan ID --}}
-                            <a href="{{ route('transaksi.cetak', $transaksi->id_transaksi) }}?reprint=true" target="_blank" 
-                               class="inline-flex border border-[#3aafa9] text-[#3aafa9] hover:bg-[#3aafa9] hover:text-[#0B0909] text-[10px] font-bold py-1.5 px-3 rounded-xl transition duration-150 items-center justify-center space-x-1.5 active:scale-95 cursor-pointer">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 000-4H9a2 2 0 000 4zm8-12V5a2 2 0 00-2-2H7a2 2 0 00-2 2v4h14z"></path>
-                                </svg>
-                                <span>Print Ulang</span>
-                            </a>
+                            <div class="inline-flex items-center justify-center gap-1.5">
+                                {{-- Tombol Print Ulang (Thermal) --}}
+                                <a href="{{ route('transaksi.cetak', $transaksi->id_transaksi) }}?reprint=true" target="_blank" 
+                                   class="inline-flex border border-[#3aafa9] text-[#3aafa9] hover:bg-[#3aafa9] hover:text-[#0B0909] text-[10px] font-bold py-1.5 px-3 rounded-xl transition duration-150 items-center justify-center space-x-1.5 active:scale-95 cursor-pointer"
+                                   title="Cetak Struk Thermal">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 000-4H9a2 2 0 000 4zm8-12V5a2 2 0 00-2-2H7a2 2 0 00-2 2v4h14z"></path>
+                                    </svg>
+                                    <span>Print</span>
+                                </a>
+
+                                {{-- Tombol E-Ticket (Digital/PDF) --}}
+                                <a href="{{ route('transaksi.download', $transaksi->id_transaksi) }}" target="_blank" 
+                                   class="inline-flex bg-[#3aafa9] text-[#0B0909] hover:bg-[#2b8a85] text-[10px] font-bold py-1.5 px-3 rounded-xl transition duration-150 items-center justify-center space-x-1.5 active:scale-95 cursor-pointer shadow-sm"
+                                   title="Unduh / Tampilkan E-Ticket">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    <span>E-Ticket</span>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                 @empty

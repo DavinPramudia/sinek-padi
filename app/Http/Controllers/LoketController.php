@@ -123,7 +123,7 @@ class LoketController extends Controller
                 'no_karcis'     => $noKarcis,
                 'total_bayar'   => $request->total_bayar ?? 0,
                 'waktu'         => now(),
-                'reprint_count' => 0,                    
+                'reprint_count' => 0,                     
                 'metode_cetak'  => $request->metode_cetak ?? 'print',
                 'id_users'      => auth()->id(),       
                 'id_tarif'      => $request->id_tarif, 
@@ -143,22 +143,14 @@ class LoketController extends Controller
 
             DB::commit();
 
-            // if ($request->metode_cetak === 'e-ticket') {
-            //     // Jika pilih e-ticket, arahkan URL-nya ke halaman khusus QR Code
-            //     $urlTujuan = route('transaksi.qrcode', $transaksi->id_transaksi);
-            // } else {
-            //     // Jika pilih print biasa, arahkan ke URL cetak kertas thermal
-            //     $urlTujuan = route('transaksi.cetak', $transaksi->id_transaksi);
-            // }
-
-            // return response()->json([
-            //     'status'    => 'sukses',
-            //     'url_print' => $urlTujuan
-            // ]);
+            // Tentukan URL tujuan berdasarkan pilihan metode cetak di modal
+            $urlCetak = $request->metode_cetak === 'e-ticket'
+                ? route('transaksi.download', $transaksi->id_transaksi)
+                : route('transaksi.cetak', $transaksi->id_transaksi);
 
             return response()->json([
-            'status' => 'sukses',
-            'url_print' => route('transaksi.cetak', $transaksi->id_transaksi)
+                'status'    => 'sukses',
+                'url_print' => $urlCetak
             ]);
 
         } catch (\Exception $e) {
@@ -202,7 +194,7 @@ class LoketController extends Controller
 
         if ($mode === 'e-ticket') {
             $pdf = Pdf::loadView('transaksi.cetak-struk', compact('transaksi'))
-                        ->setPaper([0, 0, 164, 350], 'portrait'); 
+                    ->setPaper([0, 0, 164, 350], 'portrait'); 
 
             return $pdf->download('E-Ticket-' . $transaksi->no_karcis . '.pdf');
         }
@@ -210,14 +202,9 @@ class LoketController extends Controller
         return view('transaksi.cetak-struk', compact('transaksi'));
     }
 
-    // public function qrcode($id)
-    // {
-    //     $transaksi = Transaksi::with(['tarif.kendaraan', 'user'])->where('id_transaksi', $id)->first();
-
-    //     if (!$transaksi) {
-    //         abort(404, 'Data transaksi tidak ditemukan.');
-    //     }
-
-    //     return view('transaksi.qr-tiket', compact('transaksi'));
-    // }
+    public function downloadEticket($id)
+    {
+        $request = new Request(['mode' => 'e-ticket']);
+        return $this->cetak($request, $id);
+    }
 }

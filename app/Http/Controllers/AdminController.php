@@ -61,7 +61,6 @@ class AdminController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            // Perhatikan bagian belakang ini: pastikan ada ',id_users' agar sesuai dengan database-mu
             'username' => 'required|string|unique:users,username,' . $id . ',id_users',
             'id_roles' => 'required|integer',
         ]);

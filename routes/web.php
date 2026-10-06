@@ -24,20 +24,18 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/petugas/loket', [LoketController::class, 'index'])->name('petugas.loket');
         Route::post('/transaksi/store', [LoketController::class, 'store'])->name('transaksi.store');
         Route::get('/transaksi/cetak/{id}', [LoketController::class, 'cetak'])->name('transaksi.cetak');
+        Route::get('/transaksi/download/{id}', [LoketController::class, 'downloadEticket'])->name('transaksi.download');    
     });
 
 
     Route::middleware(['admin'])->group(function () {
         
-        // Halaman Admin Dashboard
         Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
         Route::get('/admin/dashboard/export-excel', [DashboardController::class, 'exportExcel'])->name('admin.dashboard.export');
         
-        // Halaman Laporan Transaksi Admin
         Route::get('/admin/laporan-transaksi', [LaporanController::class, 'index'])->name('admin.laporan-transaksi');
         Route::get('/admin/laporan-transaksi/export-excel', [LaporanController::class, 'exportExcel'])->name('admin.laporan.export');
 
-        // Halaman Manajemen Akun
         Route::get('/admin/manajemen-akun', [AdminController::class, 'manajemenAkun'])->name('admin.manajemen-akun');
         Route::get('/admin/manajemen-akun/tambah', [AdminController::class, 'create'])->name('admin.manajemen-akun.tambah');
         Route::post('/admin/manajemen-akun/store', [AdminController::class, 'store'])->name('admin.manajemen-akun.store');
@@ -45,7 +43,6 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/admin/manajemen-akun/update/{id}', [AdminController::class, 'update'])->name('admin.manajemen-akun.update');
         Route::delete('/admin/manajemen-akun/delete/{id}', [AdminController::class, 'destroy'])->name('admin.manajemen-akun.destroy');
 
-        // Halaman Pengaturan Admin
         Route::get('/admin/pengaturan', [PengaturanController::class, 'index'])->name('admin.pengaturan');
         Route::put('/admin/pengaturan/{id}', [PengaturanController::class, 'update'])->name('admin.pengaturan.update');
     });
