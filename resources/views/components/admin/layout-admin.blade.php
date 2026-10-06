@@ -12,28 +12,28 @@
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="bg-[#0B0909] text-[#EDEDED] flex h-screen overflow-hidden">
+<body class="bg-[#0B0909] text-[#EDEDED] antialiased">
 
-    <!-- Memanggil Komponen Sidebar -->
-    <x-admin.sidebar-admin></x-admin.sidebar-admin>
+    <!-- 1. Sidebar di Kiri (Dibuat fixed agar tetap diam saat halaman di-scroll) -->
+    <div class="fixed inset-y-0 left-0 z-40">
+        <x-admin.sidebar-admin></x-admin.sidebar-admin>
+    </div>
 
-    <!-- Konten Kanan (Header & Main Slot) -->
-    <div class="flex-1 flex flex-col h-full overflow-hidden">
+    <!-- 2. Konten Kanan (Diberi margin-left seluas lebar sidebar, misal ml-64) -->
+    <div class="ml-64 flex flex-col min-h-screen">
         
-        <!-- Memanggil Komponen Header -->
+        <!-- Header Admin (Otomatis sticky mengikuti scroll body seperti petugas) -->
         <x-admin.header-admin :title="$title ?? 'Dashboard'"></x-admin.header-admin>
 
         <!-- Konten Utama Halaman -->
-        <main class="flex-1 p-8 overflow-y-auto">
+        <main class="flex-1 p-8">
             {{ $slot }}
         </main>
 
     </div>
 
-    <!-- STACK UNTUK MENANGKAP SCRIPT DARI HALAMAN ANAK -->
+    <!-- STACK & SCRIPTS -->
     @stack('scripts')
-
-    <!-- TAMBAHKAN PEMANGGILAN SCRIPT FILTER DI SINI -->
     <script src="{{ asset('resources/js/filter-laporan.js') }}"></script>
 
 </body>

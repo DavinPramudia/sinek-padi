@@ -45,9 +45,15 @@ class DashboardExport implements FromArray, WithStyles, WithEvents
             [''],
         ];
 
-        // 4. Jika filter tahunan, tampilkan tabel rincian lengkap per bulan (7 Kolom)
+        // 4. Jika ada rincian bulanan (berlaku untuk filter Tahunan & Triwulanan)
         if (!empty($this->data['rincianBulanan'])) {
-            $rows[] = ['-- RINCIAN SENSUS & KENDARAAN PER BULAN --', 'Motor', 'Mobil', 'Lokal', 'Nusantara', 'Mancanegara', 'Total Pendapatan'];
+            // Tentukan judul tabel secara dinamis berdasarkan jenis filter
+            $filterType = $this->data['filterType'] ?? 'tahunan';
+            $judulRincian = ($filterType === 'triwulanan') 
+                ? '-- RINCIAN SENSUS & KENDARAAN PERIODE TRIWULAN --' 
+                : '-- RINCIAN SENSUS & KENDARAAN PER BULAN --';
+
+            $rows[] = [$judulRincian, 'Motor', 'Mobil', 'Lokal', 'Nusantara', 'Mancanegara', 'Total Pendapatan'];
             
             foreach ($this->data['rincianBulanan'] as $item) {
                 $rows[] = [

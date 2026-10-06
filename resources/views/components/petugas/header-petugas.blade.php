@@ -1,7 +1,8 @@
 <nav class="bg-[#0B0909]/50 border-b border-[#EDEDED] py-1 px-6 flex justify-between items-center sticky top-0 z-50">
     {{-- Kiri --}}
     <div class="flex items-center space-x-0">
-<img src="{{ asset('assets/images/logo-sinek-padi.png') }}" alt="Logo SINEK PADI" class="h-9 w-auto object-contain">        <span class="text-sm text-[#EDEDED] pl-4">Dinas Pariwisata Kota Pangkal Pinang</span>
+        <img src="{{ asset('assets/images/logo-sinek-padi.png') }}" alt="Logo SINEK PADI" class="h-9 w-auto object-contain">        
+        <span class="text-sm text-[#EDEDED] pl-4">Dinas Pariwisata Kota Pangkal Pinang</span>
     </div>
 
     {{-- Kanan --}}

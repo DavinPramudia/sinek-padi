@@ -52,7 +52,7 @@ class DashboardController extends Controller
             }
         }
 
-        // 5. Data Tren Kunjungan & Rincian Bulanan (Khusus Tahunan)
+        // 5. Data Tren Kunjungan & Rincian Bulanan (Khusus Tahunan & Triwulanan)
         $trenKunjungan = [];
         $labelsGrafik = [];
         $rincianBulanan = [];
@@ -71,8 +71,8 @@ class DashboardController extends Controller
         elseif ($filterType == 'tahunan' && $request->filled('tahun')) {
             for ($bulan = 1; $bulan <= 12; $bulan++) {
                 $queryBulan = (clone $transaksiQuery)->with(['details.kategoriWisatawan', 'tarif.kendaraan'])
-                                                     ->whereYear('waktu', $request->tahun)
-                                                     ->whereMonth('waktu', $bulan);
+                                                   ->whereYear('waktu', $request->tahun)
+                                                   ->whereMonth('waktu', $bulan);
                 
                 $transaksiBulanList = $queryBulan->get();
                 $totalPendapatanBulan = $transaksiBulanList->sum('total_bayar');
@@ -119,11 +119,45 @@ class DashboardController extends Controller
             $bulanSelesai = $bulanMulai + 2;
 
             for ($bulan = $bulanMulai; $bulan <= $bulanSelesai; $bulan++) {
-                $jumlah = (clone $transaksiQuery)->whereYear('waktu', $tahun)
-                                               ->whereMonth('waktu', $bulan)
-                                               ->count();
-                $trenKunjungan[] = $jumlah;
-                $labelsGrafik[] = Carbon::create(null, $bulan)->translatedFormat('M');
+                $queryBulan = (clone $transaksiQuery)->with(['details.kategoriWisatawan', 'tarif.kendaraan'])
+                                                   ->whereYear('waktu', $tahun)
+                                                   ->whereMonth('waktu', $bulan);
+
+                $transaksiBulanList = $queryBulan->get();
+                $totalPendapatanBulan = $transaksiBulanList->sum('total_bayar');
+                $jumlahTransaksi = $transaksiBulanList->count();
+
+                $lokalBulan = 0; $nusantaraBulan = 0; $mancanegaraBulan = 0;
+                $motorBulan = 0; $mobilBulan = 0;
+
+                foreach ($transaksiBulanList as $item) {
+                    $sensusParts = explode(' / ', $item->sensus_rangkuman ?? '0 / 0 / 0');
+                    $lokalBulan += (int) ($sensusParts[0] ?? 0);
+                    $nusantaraBulan += (int) ($sensusParts[1] ?? 0);
+                    $mancanegaraBulan += (int) ($sensusParts[2] ?? 0);
+
+                    $namaKendaraan = strtolower(optional($item->tarif->kendaraan)->nama_kendaraan ?? '');
+                    if (str_contains($namaKendaraan, 'motor')) {
+                        $motorBulan++;
+                    } elseif (str_contains($namaKendaraan, 'mobil')) {
+                        $mobilBulan++;
+                    }
+                }
+
+                $namaBulan = Carbon::create(null, $bulan)->translatedFormat('F');
+
+                $trenKunjungan[] = $jumlahTransaksi;
+                $labelsGrafik[] = $namaBulan;
+
+                $rincianBulanan[] = [
+                    'bulan' => $namaBulan,
+                    'motor' => $motorBulan,
+                    'mobil' => $mobilBulan,
+                    'lokal' => $lokalBulan,
+                    'nusantara' => $nusantaraBulan,
+                    'mancanegara' => $mancanegaraBulan,
+                    'pendapatan' => $totalPendapatanBulan
+                ];
             }
         }
         else {
@@ -170,7 +204,7 @@ class DashboardController extends Controller
         };
 
         return compact(
-            'totalPendapatan', 'totalKendaraan', 'totalWisatawan',
+            'filterType', 'totalPendapatan', 'totalKendaraan', 'totalWisatawan',
             'wisatawanLokal', 'wisatawanNusantara', 'wisatawanMancanegara',
             'kendaraanMotor', 'kendaraanMobil', 'trenKunjungan', 'labelsGrafik', 
             'labelPeriode', 'satuanWaktu', 'chartConfig', 'rincianBulanan'

@@ -4,35 +4,43 @@
     <meta charset="UTF-8">
     <title>Struk Karcis - SINEK-PADI</title>
     <style>
-        @page {
-            size: 58mm 95mm; 
-            margin: 2mm;
-        }
+    @page {
+        size: 58mm 95mm; 
+        margin: 2mm;
+    }
 
-        body {
-            font-family: "Courier", "Courier New", monospace !important;            
-            font-size: 11px;
+    body {
+        /* Browser pakai Courier New, DomPDF otomatis mengarahkan ke font bawaannya */
+        font-family: 'Courier New', Courier, monospace !important;            
+        font-size: 11px;
+        width: 54mm; 
+        margin: 0 auto;
+        padding: 2px;
+        color: #000;
+        background: #fff;
+        box-sizing: border-box;
+    }
+
+    .text-center { text-align: center; }
+    
+    .font-bold { 
+        font-weight: bold; 
+    }
+
+    .flex-between { display: flex; justify-content: space-between; }
+    .border-dashed { border-bottom: 1px dashed #000; margin: 6px 0; }
+    
+    @media print {
+        body { 
             width: 54mm; 
-            margin: 0 auto;
-            padding: 2px;
-            color: #000;
-            background: #fff;
-            box-sizing: border-box;
+            margin: 0;
+            padding: 2mm;
         }
-
-        .text-center { text-align: center; }
-        .font-bold { font-weight: bold; }
-        .flex-between { display: flex; justify-content: space-between; }
-        .border-dashed { border-bottom: 1px dashed #000; margin: 6px 0; }
-        
-        @media print {
-            body { 
-                width: 54mm; 
-                margin: 0;
-                padding: 2mm;
-            }
+        .no-print { 
+            display: none !important; 
         }
-    </style>
+    }
+</style>
 </head>
 <body onload="window.print()">
 

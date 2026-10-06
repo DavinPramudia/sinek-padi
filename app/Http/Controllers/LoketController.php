@@ -17,8 +17,9 @@ class LoketController extends Controller
     public function index()
     {
         $tanggalHariIni = now()->toDateString();
+        $userId = auth()->id(); 
 
-        // 1. Ambil data tarif & relasi ke kendaraan menggunakan Eloquent Model
+        // 1. Data tarif & kategori wisatawan 
         $KategoriKendaraan = Tarif::with('kendaraan')->get()->map(function($tarif) {
             return (object)[
                 'id_tarif' => $tarif->id_tarif,
@@ -29,22 +30,24 @@ class LoketController extends Controller
 
         $KategoriWisatawan = KategoriWisatawan::all(); 
 
-        // Mapping untuk frontend
         $tarifMap = $KategoriKendaraan->pluck('harga_tarif', 'id_tarif')->toArray();
         $qtyMap = $KategoriWisatawan->pluck('id_kategori_wisatawan')->mapWithKeys(fn($id) => [$id => 0])->toArray();
 
-        // 2. Ringkasan Pendapatan Hari Ini
-        $totalPendapatan = Transaksi::whereDate('waktu', $tanggalHariIni)->sum('total_bayar') ?? 0;
+        $baseQuery = Transaksi::whereDate('waktu', $tanggalHariIni)
+                              ->where('id_users', $userId);
 
-        // 3. Total Tiket Terbit Hari Ini
-        $totalTiket = Transaksi::whereDate('waktu', $tanggalHariIni)->count();
+        // 2. Ringkasan Pendapatan 
+        $totalPendapatan = (clone $baseQuery)->sum('total_bayar') ?? 0;
 
-        // 4. Hitung Kendaraan secara Dinamis dari Database
+        // 3. Total Tiket 
+        $totalTiket = (clone $baseQuery)->count();
+
+        // 4. Statistik Kendaraan
         $listKendaraan = Kendaraan::all(); 
         $statistikKendaraan = [];
 
         foreach ($listKendaraan as $k) {
-            $jumlahTransaksi = Transaksi::whereDate('waktu', $tanggalHariIni)
+            $jumlahTransaksi = (clone $baseQuery)
                 ->whereHas('tarif.kendaraan', function($q) use ($k) {
                     $q->where('nama_kendaraan', $k->nama_kendaraan);
                 })->count();
@@ -55,39 +58,33 @@ class LoketController extends Controller
             ];
         }
 
-        // 5. Hitung Mobil menggunakan relasi Eloquent
-        $totalMobil = Transaksi::whereDate('waktu', $tanggalHariIni)
+        // 5. Total Mobil
+        $totalMobil = (clone $baseQuery)
             ->whereHas('tarif.kendaraan', function($q) {
                 $q->where('nama_kendaraan', 'LIKE', '%mobil%');
             })->count();
 
         // 6. Total Wisatawan
-        $totalWisatawan = DetailWisatawanTransaksi::whereHas('transaksi', function($q) use ($tanggalHariIni) {
-            $q->whereDate('waktu', $tanggalHariIni);
+        $totalWisatawan = DetailWisatawanTransaksi::whereHas('transaksi', function($q) use ($tanggalHariIni, $userId) {
+            $q->whereDate('waktu', $tanggalHariIni)
+              ->where('id_users', $userId);
         })->sum('jumlah_jiwa') ?? 0;
 
-        // 7. Ambil Riwayat Transaksi (5 terakhir hari ini) dengan Eloquent Relationships
-        $riwayatTransaksi = Transaksi::with(['tarif.kendaraan', 'details.kategoriWisatawan'])
-            ->whereDate('waktu', $tanggalHariIni)
+        // 7. Riwayat Transaksi 
+        $riwayatTransaksi = (clone $baseQuery)
+            ->with(['tarif.kendaraan', 'details.kategoriWisatawan'])
             ->orderBy('waktu', 'desc')
             ->limit(5)
             ->get();
 
         foreach ($riwayatTransaksi as $trx) {
-            $lokal = 0;
-            $nusantara = 0;
-            $mancanegara = 0;
+            $lokal = 0; $nusantara = 0; $mancanegara = 0;
 
             foreach ($trx->details as $det) {
                 $nama = strtolower($det->kategoriWisatawan->nama_kategori_wisatawan ?? '');
-
-                if (str_contains($nama, 'lokal')) {
-                    $lokal += $det->jumlah_jiwa;
-                } elseif (str_contains($nama, 'nusantara')) {
-                    $nusantara += $det->jumlah_jiwa;
-                } elseif (str_contains($nama, 'mancanegara') || str_contains($nama, 'asing')) {
-                    $mancanegara += $det->jumlah_jiwa;
-                }
+                if (str_contains($nama, 'lokal')) $lokal += $det->jumlah_jiwa;
+                elseif (str_contains($nama, 'nusantara')) $nusantara += $det->jumlah_jiwa;
+                elseif (str_contains($nama, 'mancanegara') || str_contains($nama, 'asing')) $mancanegara += $det->jumlah_jiwa;
             }
 
             $trx->nama_kendaraan = $trx->tarif->kendaraan->nama_kendaraan ?? '-';
@@ -97,15 +94,8 @@ class LoketController extends Controller
         }
 
         return view('petugas.loket', compact(
-            'KategoriKendaraan', 
-            'KategoriWisatawan', 
-            'tarifMap',
-            'qtyMap',
-            'totalPendapatan', 
-            'totalTiket', 
-            'statistikKendaraan', 
-            'totalWisatawan',
-            'riwayatTransaksi'
+            'KategoriKendaraan', 'KategoriWisatawan', 'tarifMap', 'qtyMap',
+            'totalPendapatan', 'totalTiket', 'statistikKendaraan', 'totalWisatawan', 'riwayatTransaksi'
         ));
     }
 
@@ -176,7 +166,6 @@ class LoketController extends Controller
         if ($request->has('reprint') && $request->reprint == 'true') {
             $transaksi->increment('reprint_count');
         }
-        // ----------------------------------------
 
         $transaksi->details = DetailWisatawanTransaksi::with('kategoriWisatawan')
             ->where('id_transaksi', $id)
