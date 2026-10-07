@@ -1,11 +1,10 @@
 <x-admin.layout-admin title="Pengaturan Sistem">
-    {{-- Inisialisasi Alpine.js untuk kontrol modal dan form aktif --}}
     <div class="flex flex-col h-full space-y-6 max-w-3xl" x-data="{ openSaveModal: false, activeForm: null }">
         
         <!-- HEADER -->
         <div>
             <h1 class="text-2xl font-bold text-[#EDEDED]">Pengaturan Sistem SINEK-PADI</h1>
-            <p class="text-sm text-[#d1d5dc] mt-1">Kelola dan perbarui nominal tarif retribusi kendaraan pos masuk.</p>
+            <p class="text-sm text-[#d1d5dc] mt-1">Kelola dan perbarui nominal tarif kendaraan masuk.</p>
         </div>
 
         <!-- NOTIFIKASI BERHASIL -->
@@ -19,7 +18,7 @@
         <!-- KARTU PENGATURAN TARIF -->
         <div class="bg-[#141c1a] border border-[#243733] rounded-xl p-6 space-y-6 shadow-lg">
             <div class="border-b border-[#243733] pb-3">
-                <h2 class="text-lg font-semibold text-white">Daftar Tarif Retribusi Kendaraan</h2>
+                <h2 class="text-lg font-semibold text-white">Daftar Tarif Kendaraan</h2>
                 <p class="text-xs text-[#d1d5dc] mt-0.5">Perubahan tarif ini akan langsung diterapkan pada transaksi baru berikutnya.</p>
             </div>
 
@@ -31,7 +30,7 @@
 
                         <div>
                             <span class="text-sm font-bold text-white tracking-wide">{{ $tarif->nama_kendaraan }}</span>
-                            <p class="text-[11px] text-[#d1d5dc]">Tarif retribusi sekali masuk</p>
+                            <p class="text-[11px] text-[#d1d5dc]">Tarif sekali masuk</p>
                         </div>
 
                         <div class="flex items-center gap-2 w-full sm:w-auto">

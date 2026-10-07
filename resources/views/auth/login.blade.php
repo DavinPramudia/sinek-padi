@@ -25,7 +25,7 @@
 
             <div class="space-y-3">
                 <h1 class="text-4xl md:text-4xl font-extrabold text-white leading-tight">
-                    Sistem Informasi Loket Retribusi & Pendataan Wisatawan
+                    Sistem Informasi Pencatatan loket dan pendataan Pantai Pasir Padi
                 </h1>
                 <p class="text-base text-[#d1d5dc] leading-relaxed">
                     Kawasan Pariwisata Pantai Pasir Padi. Silakan masuk menggunakan akun resmi petugas untuk mulai mengelola transaksi harian.

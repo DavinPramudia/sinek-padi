@@ -5,7 +5,7 @@
         <div class="flex flex-col lg:flex-row lg:justify-between lg:items-end gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-[#EDEDED] mb-1">Panel Kontrol Admin SINEK-PADI</h1>
-                <p class="text-sm text-[#d1d5dc]">Sistem Informasi Retribusi & Sensus Wisatawan Pasir Padi</p>
+                <p class="text-sm text-[#d1d5dc]">Sistem Informasi Pencatatan loket dan Pendataan Pantai Pasir Padi</p>
             </div>
 
             <!-- MEMANGGIL KOMPONEN FILTER -->
