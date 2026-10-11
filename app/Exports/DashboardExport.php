@@ -45,32 +45,41 @@ class DashboardExport implements FromArray, WithStyles, WithEvents
             [''],
         ];
 
-        // 4. Jika ada rincian bulanan (berlaku untuk filter Tahunan & Triwulanan)
+        // 4. Rincian Data (Berlaku untuk Bulanan, Triwulanan, & Tahunan)
         if (!empty($this->data['rincianBulanan'])) {
-            // Tentukan judul tabel secara dinamis berdasarkan jenis filter
-            $filterType = $this->data['filterType'] ?? 'tahunan';
-            $judulRincian = ($filterType === 'triwulanan') 
-                ? '-- RINCIAN SENSUS & KENDARAAN PERIODE TRIWULAN --' 
-                : '-- RINCIAN SENSUS & KENDARAAN PER BULAN --';
+            $filterType = $this->data['filterType'] ?? 'bulanan';
+            
+            // Tentukan judul tabel secara dinamis agar Bulanan juga punya format tabel rincian lengkap
+            if ($filterType === 'triwulanan') {
+                $judulRincian = '-- RINCIAN SENSUS & KENDARAAN PERIODE TRIWULAN --';
+            } elseif ($filterType === 'tahunan') {
+                $judulRincian = '-- RINCIAN SENSUS & KENDARAAN PERIODE TAHUNAN --';
+            } else {
+                $judulRincian = '-- RINCIAN SENSUS & KENDARAAN HARIAN (BULANAN) --';
+            }
 
+            // Header kolom tabel rincian (Sama persis seperti tahunan & triwulanan)
             $rows[] = [$judulRincian, 'Motor', 'Mobil', 'Lokal', 'Nusantara', 'Mancanegara', 'Total Pendapatan'];
             
             foreach ($this->data['rincianBulanan'] as $item) {
                 $rows[] = [
-                    $item['bulan'], 
-                    $item['motor'] . ' Unit', 
-                    $item['mobil'] . ' Unit', 
-                    $item['lokal'] . ' Orang', 
-                    $item['nusantara'] . ' Orang', 
-                    $item['mancanegara'] . ' Orang', 
-                    'Rp ' . number_format($item['pendapatan'], 0, ',', '.')
+                    $item['bulan'], // Ini diisi tanggal/hari jika filter bulanan, atau nama bulan jika triwulanan/tahunan
+                    ($item['motor'] ?? 0) . ' Unit', 
+                    ($item['mobil'] ?? 0) . ' Unit', 
+                    ($item['lokal'] ?? 0) . ' Orang', 
+                    ($item['nusantara'] ?? 0) . ' Orang', 
+                    ($item['mancanegara'] ?? 0) . ' Orang', 
+                    'Rp ' . number_format($item['pendapatan'] ?? 0, 0, ',', '.')
                 ];
             }
         } else {
-            $rows[] = ['-- TREN KUNJUNGAN (' . strtoupper($this->data['satuanWaktu']) . ') --', 'Jumlah Pengunjung', '', '', '', '', ''];
-            foreach ($this->data['labelsGrafik'] as $index => $label) {
-                $jumlah = $this->data['trenKunjungan'][$index] ?? 0;
-                $rows[] = [$label, $jumlah . ' Pengunjung', '', '', '', '', ''];
+            // Fallback cadangan jika data rincian tidak ada
+            $rows[] = ['-- TREN KUNJUNGAN (' . strtoupper($this->data['satuanWaktu'] ?? 'WAKTU') . ') --', 'Jumlah Pengunjung', '', '', '', '', ''];
+            if (!empty($this->data['labelsGrafik'])) {
+                foreach ($this->data['labelsGrafik'] as $index => $label) {
+                    $jumlah = $this->data['trenKunjungan'][$index] ?? 0;
+                    $rows[] = [$label, $jumlah . ' Pengunjung', '', '', '', '', ''];
+                }
             }
         }
 

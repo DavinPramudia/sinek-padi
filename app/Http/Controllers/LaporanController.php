@@ -25,30 +25,35 @@ class LaporanController extends Controller
                     4 => 'Oktober - Desember',
                     default => ''
                 };
-                return "Tribulan {$t} ({$namaBulan}) {$thn}";
+                return "Triwulan {$t} ({$namaBulan}) {$thn}";
             })(),
             default => Carbon::parse($request->input('tanggal', date('Y-m-d')))->translatedFormat('d M Y'),
         };
     }
 
-    public function index(Request $request)
+    private function getFilteredTransaksi(Request $request)
     {
         if ($request->has('search') && trim($request->input('search')) === '') {
             $request->request->remove('search');
         }
 
+        return Transaksi::with(['details.kategoriWisatawan', 'user', 'tarif.kendaraan'])
+                        ->filter($request)
+                        ->latest('waktu');
+    }
+
+    public function index(Request $request)
+    {
         $filterType = $request->input('filter_type', 'harian');
         $search = $request->input('search');
 
-        $transaksiQuery = Transaksi::with(['details.kategoriWisatawan', 'user', 'tarif.kendaraan'])
-                                   ->filter($request);
+        $transaksiQuery = $this->getFilteredTransaksi($request);
 
         $totalTransaksi = (clone $transaksiQuery)->count();
         $totalPendapatan = (clone $transaksiQuery)->sum('total_bayar');
         $labelPeriode = $this->getLabelPeriode($request, $filterType);
 
-        $transaksi = $transaksiQuery->latest('waktu')
-                                    ->paginate(5)
+        $transaksi = $transaksiQuery->paginate(5)
                                     ->onEachSide(1)
                                     ->withQueryString();
 
@@ -59,17 +64,10 @@ class LaporanController extends Controller
 
     public function exportExcel(Request $request)
     {
-        if ($request->has('search') && trim($request->input('search')) === '') {
-            $request->request->remove('search');
-        }
-        
         $filterType = $request->input('filter_type', 'harian');
         
-        $transaksi = Transaksi::with(['details.kategoriWisatawan', 'user', 'tarif.kendaraan'])
-                              ->filter($request)
-                              ->latest('waktu')
-                              ->get();
-
+        // Mengambil semua data yang sudah terfilter tanpa pagination
+        $transaksi = $this->getFilteredTransaksi($request)->get();
         $labelPeriode = $this->getLabelPeriode($request, $filterType);
 
         $namaFilePeriode = match ($filterType) {

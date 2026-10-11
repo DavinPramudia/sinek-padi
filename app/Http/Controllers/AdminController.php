@@ -78,7 +78,7 @@ class AdminController extends Controller
         $user->id_roles = $request->id_roles;
         $user->save();
 
-        return redirect()->route('admin.manajemen-akun')->with('success', 'Akun berhasil diperbarui!');
+        return back()->with('success', 'Akun berhasil diperbarui!');
     }
 
     // 5. Hapus Akun dari Database
@@ -121,11 +121,11 @@ class AdminController extends Controller
                         $fail('Password lama yang kamu masukkan salah.');
                     }
                 }],
-                'password' => 'required|string|min:6|confirmed',
+                'password' => 'required|string|min:8|confirmed',
             ], [
                 'current_password.required' => 'Password lama wajib diisi jika ingin mengganti password.',
                 'password.confirmed' => 'Konfirmasi password baru tidak cocok.',
-                'password.min' => 'Password baru minimal harus 6 karakter.',
+                'password.min' => 'Password baru minimal harus 8 karakter.',
             ]);
 
             $user->password = Hash::make($request->password);

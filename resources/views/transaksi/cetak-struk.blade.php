@@ -10,7 +10,6 @@
     }
 
     body {
-        /* Browser pakai Courier New, DomPDF otomatis mengarahkan ke font bawaannya */
         font-family: 'Courier New', Courier, monospace !important;            
         font-size: 11px;
         width: 54mm; 

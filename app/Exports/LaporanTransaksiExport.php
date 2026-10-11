@@ -31,7 +31,6 @@ class LaporanTransaksiExport implements FromCollection, WithHeadings, WithStyles
         $totalBayarSemua = 0;
 
         foreach ($this->transaksi as $index => $item) {
-            // Memanggil atribut otomatis dari Model Transaksi
             $sensusParts = explode(' / ', $item->sensus_rangkuman ?? '0 / 0 / 0');
             
             $lokal = (int) ($sensusParts[0] ?? 0);
@@ -57,11 +56,13 @@ class LaporanTransaksiExport implements FromCollection, WithHeadings, WithStyles
             ]);
         }
 
+        // Baris Kosong Pemisah
         $rows->push([
             'no' => '', 'no_tiket' => '', 'waktu' => '', 'kategori' => '',
             'lokal' => '', 'nusantara' => '', 'mancanegara' => '', 'total_bayar' => '', 'petugas' => ''
         ]);
 
+        // Baris Total Keseluruhan
         $rows->push([
             'no' => 'JUMLAH', 
             'no_tiket' => '', 
@@ -87,13 +88,25 @@ class LaporanTransaksiExport implements FromCollection, WithHeadings, WithStyles
 
     public function styles(Worksheet $sheet)
     {
-        $sheet->getStyle('E3:H5000')->getNumberFormat()->setFormatCode('#,##0');
+        // Hitung total baris data agar format dinamis dan tidak terpaku angka 5000
+        $totalRow = count($this->transaksi) + 4; // Header 2 baris + data + baris kosong + baris jumlah
+
+        // Format angka jumlah orang (Kolom E, F, G)
+        $sheet->getStyle('E3:G' . $totalRow)->getNumberFormat()->setFormatCode('#,##0');
+        
+        // Format angka total bayar Rupiah (Kolom H)
+        $sheet->getStyle('H3:H' . $totalRow)->getNumberFormat()->setFormatCode('"Rp "#,##0');
 
         return [
-            1 => ['font' => ['bold' => true]], 
+            1 => ['font' => ['bold' => true, 'size' => 13]], 
             2 => [
                 'font' => ['bold' => true, 'color' => ['argb' => 'FFFFFF']], 
                 'fill' => ['fillType' => 'solid', 'startColor' => ['argb' => '243733']]
+            ],
+            // Styling khusus untuk baris "JUMLAH" di paling bawah
+            $totalRow => [
+                'font' => ['bold' => true],
+                'fill' => ['fillType' => 'solid', 'startColor' => ['argb' => 'E2E8F0']] // Warna abu-abu soft elegan
             ]
         ];
     }

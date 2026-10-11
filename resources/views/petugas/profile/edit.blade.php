@@ -59,7 +59,7 @@
             <div x-data="{ showPassword: false }">
                 <label class="block text-xs font-medium text-[#EDEDED] mb-2">Password Baru <span class="text-gray-500 font-normal">(Kosongkan jika tidak ingin mengubah)</span></label>
                 <div class="relative">
-                    <input :type="showPassword ? 'text' : 'password'" name="password" placeholder="Minimal 6 karakter" 
+                    <input :type="showPassword ? 'text' : 'password'" name="password" placeholder="Minimal 8 karakter" 
                            class="bg-[#0B0909] border @error('password') border-red-500 @else border-[#243733] @enderror text-[#EDEDED] text-xs rounded-lg focus:ring-[#3aafa9] focus:border-[#3aafa9] block w-full p-3 pr-10 outline-none">
                     
                     <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-[#EDEDED] cursor-pointer">

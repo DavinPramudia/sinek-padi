@@ -52,7 +52,7 @@ class DashboardController extends Controller
             }
         }
 
-        // 5. Data Tren Kunjungan & Rincian Bulanan (Khusus Tahunan & Triwulanan)
+        // 5. Data Tren Kunjungan & Rincian Bulanan (Menggunakan Collection Grouping / Tanpa Query di dalam Loop)
         $trenKunjungan = [];
         $labelsGrafik = [];
         $rincianBulanan = [];
@@ -61,20 +61,62 @@ class DashboardController extends Controller
             $tahunBulan = explode('-', $request->bulan);
             $jumlahHari = Carbon::create($tahunBulan[0], $tahunBulan[1])->daysInMonth;
             
+            // Kelompokkan data transaksi berdasarkan tanggal (format: Y-m-d)
+            $groupedByDate = $transaksiList->groupBy(function($item) {
+                return Carbon::parse($item->waktu)->format('Y-m-d');
+            });
+
             for ($hari = 1; $hari <= $jumlahHari; $hari++) {
                 $tanggalLengkap = $request->bulan . '-' . str_pad($hari, 2, '0', STR_PAD_LEFT);
-                $jumlah = (clone $transaksiQuery)->whereDate('waktu', $tanggalLengkap)->count();
-                $trenKunjungan[] = $jumlah;
+                
+                // Ambil data dari hasil grouping memori (tidak nembak DB lagi)
+                $transaksiHariList = $groupedByDate->get($tanggalLengkap, collect());
+                
+                $totalPendapatanHari = $transaksiHariList->sum('total_bayar');
+                $jumlahTransaksiHari = $transaksiHariList->count();
+
+                $lokalHari = 0; $nusantaraHari = 0; $mancanegaraHari = 0;
+                $motorHari = 0; $mobilHari = 0;
+
+                foreach ($transaksiHariList as $item) {
+                    $sensusParts = explode(' / ', $item->sensus_rangkuman ?? '0 / 0 / 0');
+                    $lokalHari += (int) ($sensusParts[0] ?? 0);
+                    $nusantaraHari += (int) ($sensusParts[1] ?? 0);
+                    $mancanegaraHari += (int) ($sensusParts[2] ?? 0);
+
+                    $namaKendaraan = strtolower(optional($item->tarif->kendaraan)->nama_kendaraan ?? '');
+                    if (str_contains($namaKendaraan, 'motor')) {
+                        $motorHari++;
+                    } elseif (str_contains($namaKendaraan, 'mobil')) {
+                        $mobilHari++;
+                    }
+                }
+
+                $formatTanggalLabel = Carbon::create($tahunBulan[0], $tahunBulan[1], $hari)->translatedFormat('d M Y');
+
+                $trenKunjungan[] = $jumlahTransaksiHari;
                 $labelsGrafik[] = (string) $hari;
+
+                $rincianBulanan[] = [
+                    'bulan' => $formatTanggalLabel,
+                    'motor' => $motorHari,
+                    'mobil' => $mobilHari,
+                    'lokal' => $lokalHari,
+                    'nusantara' => $nusantaraHari,
+                    'mancanegara' => $mancanegaraHari,
+                    'pendapatan' => $totalPendapatanHari
+                ];
             }
         } 
         elseif ($filterType == 'tahunan' && $request->filled('tahun')) {
+            // Kelompokkan berdasarkan angka bulan (1 sampai 12)
+            $groupedByMonth = $transaksiList->groupBy(function($item) {
+                return (int) Carbon::parse($item->waktu)->format('n');
+            });
+
             for ($bulan = 1; $bulan <= 12; $bulan++) {
-                $queryBulan = (clone $transaksiQuery)->with(['details.kategoriWisatawan', 'tarif.kendaraan'])
-                                                   ->whereYear('waktu', $request->tahun)
-                                                   ->whereMonth('waktu', $bulan);
+                $transaksiBulanList = $groupedByMonth->get($bulan, collect());
                 
-                $transaksiBulanList = $queryBulan->get();
                 $totalPendapatanBulan = $transaksiBulanList->sum('total_bayar');
                 $jumlahTransaksi = $transaksiBulanList->count();
 
@@ -112,18 +154,19 @@ class DashboardController extends Controller
             }
         } 
         elseif ($filterType == 'triwulanan') {
-            $tahun = $request->input('tahun_triwulan', date('Y'));
-            $triwulan = $request->input('triwulan', 1);
+            $triwulanan = $request->input('triwulan', 1);
+            $tahun = $request->input('tahun_triwulan', date('Y')); // Pastikan variabel tahun terbaca aman
 
-            $bulanMulai = (($triwulan - 1) * 3) + 1;
+            $bulanMulai = (($triwulanan - 1) * 3) + 1;
             $bulanSelesai = $bulanMulai + 2;
 
-            for ($bulan = $bulanMulai; $bulan <= $bulanSelesai; $bulan++) {
-                $queryBulan = (clone $transaksiQuery)->with(['details.kategoriWisatawan', 'tarif.kendaraan'])
-                                                   ->whereYear('waktu', $tahun)
-                                                   ->whereMonth('waktu', $bulan);
+            $groupedByMonth = $transaksiList->groupBy(function($item) {
+                return (int) Carbon::parse($item->waktu)->format('n');
+            });
 
-                $transaksiBulanList = $queryBulan->get();
+            for ($bulan = $bulanMulai; $bulan <= $bulanSelesai; $bulan++) {
+                $transaksiBulanList = $groupedByMonth->get($bulan, collect());
+                
                 $totalPendapatanBulan = $transaksiBulanList->sum('total_bayar');
                 $jumlahTransaksi = $transaksiBulanList->count();
 
