@@ -75,7 +75,7 @@ class AdminController extends Controller
             $user->password = Hash::make($request->password);
         }
 
-        $user->id_roles = $request->id_roles;
+        $user->id_roles = $request->id_roles; 
         $user->save();
 
         return back()->with('success', 'Akun berhasil diperbarui!');

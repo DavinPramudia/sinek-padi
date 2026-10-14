@@ -13,6 +13,18 @@ class LaporanController extends Controller
     private function getLabelPeriode(Request $request, $filterType)
     {
         return match ($filterType) {
+            'mingguan' => (function() use ($request) {
+                $inputMinggu = $request->input('minggu', date('Y-\WW'));
+                if (str_contains($inputMinggu, '-W')) {
+                    [$thn, $w] = explode('-W', $inputMinggu);
+                } else {
+                    $thn = date('Y');
+                    $w = date('W');
+                }
+                $start = Carbon::now()->setISODate((int)$thn, (int)$w)->startOfWeek();
+                $end = Carbon::now()->setISODate((int)$thn, (int)$w)->endOfWeek();
+                return "Minggu ( " . $start->translatedFormat('d M Y') . " s.d. " . $end->translatedFormat('d M Y') . " )";
+            })(),
             'bulanan' => $request->filled('bulan') ? Carbon::createFromFormat('Y-m', $request->bulan)->translatedFormat('F Y') : 'Bulan Ini',
             'tahunan' => 'Tahun ' . $request->input('tahun', date('Y')),
             'triwulanan' => (function() use ($request) {
@@ -37,9 +49,29 @@ class LaporanController extends Controller
             $request->request->remove('search');
         }
 
-        return Transaksi::with(['details.kategoriWisatawan', 'user', 'tarif.kendaraan'])
-                        ->filter($request)
-                        ->latest('waktu');
+        $filterType = $request->input('filter_type', 'harian');
+        $query = Transaksi::with(['details.kategoriWisatawan', 'user', 'tarif.kendaraan']);
+
+        // Tangani filter mingguan secara spesifik agar sinkron dengan dashboard
+        if ($filterType === 'mingguan') {
+            $inputMinggu = $request->input('minggu', date('Y-\WW'));
+            if (str_contains($inputMinggu, '-W')) {
+                [$tahunMinggu, $weekNumber] = explode('-W', $inputMinggu);
+            } else {
+                $tahunMinggu = date('Y');
+                $weekNumber = date('W');
+            }
+
+            $startOfWeekStr = Carbon::now()->setISODate((int)$tahunMinggu, (int)$weekNumber)->startOfWeek()->format('Y-m-d 00:00:00');
+            $endOfWeekStr = Carbon::now()->setISODate((int)$tahunMinggu, (int)$weekNumber)->endOfWeek()->format('Y-m-d 23:59:59');
+
+            $query->whereBetween('waktu', [$startOfWeekStr, $endOfWeekStr]);
+        } else {
+            // Gunakan filter bawaan model untuk harian, bulanan, triwulanan, tahunan
+            $query->filter($request);
+        }
+
+        return $query->latest('waktu');
     }
 
     public function index(Request $request)
@@ -66,12 +98,12 @@ class LaporanController extends Controller
     {
         $filterType = $request->input('filter_type', 'harian');
         
-        // Mengambil semua data yang sudah terfilter tanpa pagination
         $transaksi = $this->getFilteredTransaksi($request)->get();
         $labelPeriode = $this->getLabelPeriode($request, $filterType);
 
         $namaFilePeriode = match ($filterType) {
             'bulanan'    => 'Bulan-' . ($request->input('bulan') ?: date('Y-m')),
+            'mingguan'   => 'Minggu-' . ($request->input('minggu') ?: date('Y-\WW')),
             'tahunan'    => 'Tahun-' . $request->input('tahun', date('Y')),
             'triwulanan' => 'Triwulan-' . $request->input('triwulan', 1) . '-' . $request->input('tahun_triwulan', date('Y')),
             default      => 'Tanggal-' . $request->input('tanggal', date('Y-m-d')),
@@ -79,6 +111,6 @@ class LaporanController extends Controller
 
         $namaFile = "Laporan-Transaksi-SINEK-PADI-{$namaFilePeriode}.xlsx";
 
-        return Excel::download(new LaporanTransaksiExport($transaksi, $labelPeriode), $namaFile);
+        return Excel::download(new LaporanTransaksiExport($transaksi, $labelPeriode, $filterType), $namaFile);
     }
 }

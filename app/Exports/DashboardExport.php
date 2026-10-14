@@ -19,6 +19,8 @@ class DashboardExport implements FromArray, WithStyles, WithEvents
 
     public function array(): array
     {
+        $filterType = $this->data['filterType'] ?? 'harian';
+
         $rows = [
             ['LAPORAN REKAPITULASI DASHBOARD SINEK-PADI'],
             ['Periode Laporan', $this->data['labelPeriode']],
@@ -45,35 +47,55 @@ class DashboardExport implements FromArray, WithStyles, WithEvents
             [''],
         ];
 
-        // 4. Rincian Data (Berlaku untuk Bulanan, Triwulanan, & Tahunan)
+        // 4. Rincian Data Berdasarkan Filter Type
         if (!empty($this->data['rincianBulanan'])) {
-            $filterType = $this->data['filterType'] ?? 'bulanan';
             
-            // Tentukan judul tabel secara dinamis agar Bulanan juga punya format tabel rincian lengkap
-            if ($filterType === 'triwulanan') {
-                $judulRincian = '-- RINCIAN SENSUS & KENDARAAN PERIODE TRIWULAN --';
-            } elseif ($filterType === 'tahunan') {
-                $judulRincian = '-- RINCIAN SENSUS & KENDARAAN PERIODE TAHUNAN --';
+            // Tentukan Judul Tabel Dinamis Berdasarkan Filter
+            if ($filterType === 'mingguan') {
+                $judulRincian = '-- ANALISIS RITME KUNJUNGAN PER HARI (MINGGU INI) --';
+                // Header khusus mingguan yang memuat info Jam Terramai, Normal, Tersepi
+                $rows[] = [$judulRincian, 'Motor', 'Mobil', 'Lokal', 'Nusantara', 'Manca', 'Jam Terramai', 'Jam Normal', 'Jam Tersepi', 'Pendapatan'];
+                
+                foreach ($this->data['rincianBulanan'] as $item) {
+                    $rows[] = [
+                        $item['bulan'], // Hari (Cth: Sen, 05 Okt)
+                        ($item['motor'] ?? 0) . ' Unit', 
+                        ($item['mobil'] ?? 0) . ' Unit', 
+                        ($item['lokal'] ?? 0) . ' Orang', 
+                        ($item['nusantara'] ?? 0) . ' Orang', 
+                        ($item['mancanegara'] ?? 0) . ' Orang', 
+                        $item['jam_terramai'] ?? '-',
+                        $item['jam_normal'] ?? '-',
+                        $item['jam_tersepi'] ?? '-',
+                        'Rp ' . number_format($item['pendapatan'] ?? 0, 0, ',', '.')
+                    ];
+                }
             } else {
-                $judulRincian = '-- RINCIAN SENSUS & KENDARAAN HARIAN (BULANAN) --';
-            }
+                // Format untuk Bulanan, Triwulanan, Tahunan
+                if ($filterType === 'triwulanan') {
+                    $judulRincian = '-- RINCIAN SENSUS & KENDARAAN PERIODE TRIWULAN --';
+                } elseif ($filterType === 'tahunan') {
+                    $judulRincian = '-- RINCIAN SENSUS & KENDARAAN PERIODE TAHUNAN --';
+                } else {
+                    $judulRincian = '-- RINCIAN SENSUS & KENDARAAN HARIAN (BULANAN) --';
+                }
 
-            // Header kolom tabel rincian (Sama persis seperti tahunan & triwulanan)
-            $rows[] = [$judulRincian, 'Motor', 'Mobil', 'Lokal', 'Nusantara', 'Mancanegara', 'Total Pendapatan'];
-            
-            foreach ($this->data['rincianBulanan'] as $item) {
-                $rows[] = [
-                    $item['bulan'], // Ini diisi tanggal/hari jika filter bulanan, atau nama bulan jika triwulanan/tahunan
-                    ($item['motor'] ?? 0) . ' Unit', 
-                    ($item['mobil'] ?? 0) . ' Unit', 
-                    ($item['lokal'] ?? 0) . ' Orang', 
-                    ($item['nusantara'] ?? 0) . ' Orang', 
-                    ($item['mancanegara'] ?? 0) . ' Orang', 
-                    'Rp ' . number_format($item['pendapatan'] ?? 0, 0, ',', '.')
-                ];
+                $rows[] = [$judulRincian, 'Motor', 'Mobil', 'Lokal', 'Nusantara', 'Mancanegara', 'Total Pendapatan'];
+                
+                foreach ($this->data['rincianBulanan'] as $item) {
+                    $rows[] = [
+                        $item['bulan'], 
+                        ($item['motor'] ?? 0) . ' Unit', 
+                        ($item['mobil'] ?? 0) . ' Unit', 
+                        ($item['lokal'] ?? 0) . ' Orang', 
+                        ($item['nusantara'] ?? 0) . ' Orang', 
+                        ($item['mancanegara'] ?? 0) . ' Orang', 
+                        'Rp ' . number_format($item['pendapatan'] ?? 0, 0, ',', '.')
+                    ];
+                }
             }
         } else {
-            // Fallback cadangan jika data rincian tidak ada
+            // Fallback cadangan jika data rincian kosong
             $rows[] = ['-- TREN KUNJUNGAN (' . strtoupper($this->data['satuanWaktu'] ?? 'WAKTU') . ') --', 'Jumlah Pengunjung', '', '', '', '', ''];
             if (!empty($this->data['labelsGrafik'])) {
                 foreach ($this->data['labelsGrafik'] as $index => $label) {
@@ -104,7 +126,8 @@ class DashboardExport implements FromArray, WithStyles, WithEvents
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
                 
-                foreach (['A', 'B', 'C', 'D', 'E', 'F', 'G'] as $column) {
+                // Lebarkan rentang kolom agar muat sampai kolom J jika mode mingguan aktif
+                foreach (['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'] as $column) {
                     $sheet->getColumnDimension($column)->setAutoSize(true);
                 }
             },

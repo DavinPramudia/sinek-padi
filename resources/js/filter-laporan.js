@@ -14,6 +14,8 @@ window.changeFilterInput = function() {
     let activeWrapper = null;
     if (type === 'harian') {
         activeWrapper = document.getElementById('wrapperHarian');
+    } else if (type === 'mingguan') {
+        activeWrapper = document.getElementById('wrapperMingguan'); // Tambahan untuk mingguan
     } else if (type === 'bulanan') {
         activeWrapper = document.getElementById('wrapperBulanan');
     } else if (type === 'tahunan') {

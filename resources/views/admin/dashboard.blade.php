@@ -12,14 +12,14 @@
             <x-admin.filter-header :routeAction="route('admin.dashboard')" />
         </div>
 
-            <div class="flex flex-col sm:flex-row justify-end items-end sm:items-center gap-3">
-                <a href="{{ route('admin.dashboard.export', request()->all()) }}" class="bg-[#141c1a] border border-[#243733] text-[#EDEDED] hover:bg-[#243733] text-xs font-semibold px-4 py-2.5 rounded-xl transition flex items-center space-x-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#3aafa9" class="size-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                    </svg>
-                    <span>Unduh Rekap</span>
-                </a>
-            </div>    
+        <div class="flex flex-col sm:flex-row justify-end items-end sm:items-center gap-3">
+            <a href="{{ route('admin.dashboard.export', request()->all()) }}" class="bg-[#141c1a] border border-[#243733] text-[#EDEDED] hover:bg-[#243733] text-xs font-semibold px-4 py-2.5 rounded-xl transition flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#3aafa9" class="size-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+                <span>Unduh Rekap</span>
+            </a>
+        </div>    
 
         <!-- MAIN GRID CONTENT -->
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 flex-1">
@@ -44,7 +44,7 @@
                 </div>
 
                 <!-- Line Chart Box -->
-                <div class="bg-[#141c1a] border border-[#243733] p-6 rounded-xl flex-1 flex flex-col min-h-[320] line-chart-container"
+                <div class="bg-[#141c1a] border border-[#243733] p-6 rounded-xl flex-1 flex flex-col min-h-[320px] line-chart-container"
                     data-tren="{{ json_encode($trenKunjungan ?? []) }}"
                     data-labels="{{ json_encode($labelsGrafik ?? []) }}"
                     data-max="{{ $chartConfig['max'] }}"
@@ -54,10 +54,52 @@
                         Tren Kunjungan {{ $labelPeriode }} {{ $satuanWaktu }}
                     </h2>
                     
-                    <div class="flex-1 relative w-full h-[240]">
+                    <div class="flex-1 relative w-full h-[240px]">
                         <canvas id="trenChart"></canvas>
                     </div>
                 </div>
+
+                <!-- KARTU RINCIAN RITME JAM PER HARI (KHUSUS FILTER MINGGUAN - SCROLL SAMPING) -->
+                @if(request('filter_type') == 'mingguan' && !empty($rincianBulanan))
+                    <div class="bg-[#141c1a] border border-[#243733] p-6 rounded-xl">
+                        <h3 class="text-[#EDEDED] font-semibold text-sm sm:text-base mb-4 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#3aafa9" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                            Analisis Ritme Jam Kunjungan Per Hari (Minggu Ini)
+                        </h3>
+                        
+                        <div class="flex overflow-x-auto space-x-4 pb-2 scrollbar-thin scrollbar-thumb-[#243733] scrollbar-track-transparent">
+                            @foreach($rincianBulanan as $dataHari)
+                                <div class="min-w-[220px] sm:min-w-[240px] flex-shrink-0 bg-[#0B0909] border border-[#243733] p-4 rounded-xl flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex justify-between items-center mb-2 pb-2 border-b border-[#243733]">
+                                            <span class="text-xs font-bold text-[#3aafa9]">{{ $dataHari['bulan'] }}</span>
+                                            <span class="text-[10px] bg-[#3aafa9]/10 text-[#3aafa9] px-2 py-0.5 rounded font-medium">
+                                                {{ ($dataHari['lokal'] + $dataHari['nusantara'] + $dataHari['mancanegara']) }} Pengunjung
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="space-y-2 text-xs text-[#d1d5dc] mt-3">
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-[#E17055] font-medium">🔥 Terramai:</span>
+                                                <span class="font-bold text-white">{{ $dataHari['jam_terramai'] ?? '-' }}</span>
+                                            </div>
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-[#3aafa9] font-medium">⚡ Normal:</span>
+                                                <span class="font-bold text-white">{{ $dataHari['jam_normal'] ?? '-' }}</span>
+                                            </div>
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-[#EDEDED] font-medium">🌙 Tersepi:</span>
+                                                <span class="font-bold text-white">{{ $dataHari['jam_tersepi'] ?? '-' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
 
             </div>
 
@@ -65,7 +107,7 @@
             <div class="col-span-1 flex flex-col space-y-6">
                 
                 <!-- 1. Chart Sensus Wisatawan -->
-                <div class="bg-[#141c1a] border border-[#243733] p-6 rounded-xl flex-1 flex flex-col min-h-[250] donut-wisatawan-container"
+                <div class="bg-[#141c1a] border border-[#243733] p-6 rounded-xl flex-1 flex flex-col min-h-[250px] donut-wisatawan-container"
                     data-lokal="{{ $wisatawanLokal ?? 0 }}"
                     data-nusantara="{{ $wisatawanNusantara ?? 0 }}"
                     data-mancanegara="{{ $wisatawanMancanegara ?? 0 }}">
@@ -85,7 +127,7 @@
                 </div>
 
                 <!-- 2. Chart Kendaraan -->
-                <div class="bg-[#141c1a] border border-[#243733] p-6 rounded-xl flex-1 flex flex-col min-h-[250] donut-kategori-kendaraan-container"
+                <div class="bg-[#141c1a] border border-[#243733] p-6 rounded-xl flex-1 flex flex-col min-h-[250px] donut-kategori-kendaraan-container"
                     data-motor="{{ $kendaraanMotor ?? 0 }}"
                     data-mobil="{{ $kendaraanMobil ?? 0 }}">
 
